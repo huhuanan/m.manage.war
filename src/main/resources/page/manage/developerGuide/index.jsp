@@ -185,7 +185,7 @@
 			return {
 				//key:'',
 				//openKey:'',
-				index:"model",
+				index:"action",
 				id:"",
 				title:"",
 				actions:${map.actions},
@@ -204,7 +204,8 @@
 			};
 		},
 		mounted:function(){
-			this.openModel(this.models[0].clazz);
+			var item=this.actions[0];
+			this.openAction(item.className,item.title+'<br/><small>'+item.description+'</small>');
 			var self=this;
 			window.manageDeveloperGuide=function(clazz){
 				self.showModelModal(clazz);
