@@ -249,9 +249,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								</i-input>
 							</form-item>
 							<form-item style="margin-bottom:4px;text-align:right;">
-								<checkbox-group v-model="autoLogin">
-									<checkbox label="Y"><span style="color:#fff;" v-html="'一周内自动登录'"></span></checkbox>
-								</checkbox-group>
+								<checkbox v-model="autoLogin"><span style="color:#fff;" v-html="'一周内自动登录'"></span></checkbox>
 							</form-item>
 						</i-form>
 						<div style="height:8px;"></div>
@@ -403,7 +401,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						loginCode:false,
 						codeVerify:false,
 						loginMessage:"",
-						autoLogin:['N'],
+						autoLogin:false,
 						loginInfo:{
 							'model.username':'',
 							'model.password':'',
@@ -441,7 +439,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						doLogin:function(){
 							loginVue.loginCode=false;
 							var self=this;
-							this.loginInfo['autoLogin']=this.autoLogin[0];
+							this.loginInfo['autoLogin']=this.autoLogin?"Y":"N";
 							$.execJSON('action/manageAdminLogin/doLogin',this.loginInfo,function(json){
 								console.log(json);
 								if(json.code==0){
