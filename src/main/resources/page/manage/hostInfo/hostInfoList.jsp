@@ -16,6 +16,7 @@
 					</i-col>
 					<i-col :span="18">
 						<card :dis-hover="true">
+						<div>{{cacheHost[selectHost].key}}</div>
 						<json-val :json-val="cacheHost[selectHost].value" :current-depth="0" :max-depth="1" :last="true"></json-val>
 						</card>
 					</i-col>
