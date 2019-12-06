@@ -246,7 +246,6 @@ Vue.component('json-item', {
 			return hash;
 		},
 		fillJSONData:function(data,name,value){
-			console.log(data,name,value);
 			var flag=true;
 			var index=0;
 			var arr=name.split("");
@@ -265,14 +264,10 @@ Vue.component('json-item', {
 					var nm=f1.substring(0,f1.indexOf("["));
 					var ni=f1.substring(nm.length+1,f1.length-1);
 					if(isNaN(ni)){
-						if(!data[nm]){
-							data[nm]={};
-						}
+						if(!data[nm]) data[nm]={};
 						$.fillJSONData(data[nm],ni+"."+f2,value);
 					}else{
-						if(!data[nm]){
-							data[nm]=[];
-						}
+						if(!data[nm]) data[nm]=[];
 						var n=parseInt(ni);
 						for(var i=1;i<=n+1;i++){
 							if(data[nm].length<i)data[nm].push({});
@@ -280,24 +275,19 @@ Vue.component('json-item', {
 						$.fillJSONData(data[nm][n],f2,value);
 					}
 				}else{
-					if(!data[f1]){
-						data[f1]={};
-					}
+					if(!data[f1]) data[f1]={};
 					$.fillJSONData(data[f1],f2,value);
 				}
 			}else{
-				if(name.indexOf("[")>-1&&name.indexOf("]")==name.length-1){
+				var f1=name;
+				if(f1.indexOf("[")>-1&&f1.indexOf("]")==f1.length-1){
 					var nm=f1.substring(0,f1.indexOf("["));
-					var ni=f1.substring(nm.length+1,f1.length-2);
+					var ni=f1.substring(nm.length+1,f1.length-1);
 					if(isNaN(ni)){
-						if(!data[nm]){
-							data[nm]={};
-						}
+						if(!data[nm]) data[nm]={};
 						data[nm][ni]=value;
 					}else{
-						if(!data[nm]){
-							data[nm]=[];
-						}
+						if(!data[nm]) data[nm]=[];
 						var n=parseInt(ni);
 						for(var i=0;i<=n;i++){
 							if(!data[nm][i])data[nm][i]={};
