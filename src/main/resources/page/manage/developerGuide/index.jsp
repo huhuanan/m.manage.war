@@ -17,45 +17,48 @@
 		</i-col>
 		<i-col span="18">
 			<h3 v-html="title"></h3>
-			<divider :style="{margin:'5px 0'}"/>
 			<div id="action${key}">
-				<template v-for="item in selectAction.methods">
-					<divider orientation="left" style="margin-bottom:10px;color:#2d8cf0;">{{item.title}} - {{item.description}}</divider>
-					<card :padding="0">
-					<table style="width:100%;margin:6px 0;" cellspacing="0" cellpadding="0" border="0">
-						<tr>
-							<td style="padding-left:10px;"> {{item.path}}</td>
-							<td style="width:100px;text-align:center;">权限: {{item.permission}}</td>
-							<td style="width:100px;text-align:center;"><i-button type="primary" size="small" @click.native="showTestModal(item.title,item.path)">测试</i-button></td>
-						</tr>
-					</table>
-					<div class="ivu-table-wrapper ivu-table-small">
-						<table class="ivu-table ivu-table-small" style="width:100%" cellspacing="0" cellpadding="0" border="0">
-							<tr>
-								<th style="text-align:center;">参数名称</th>
-								<th style="text-align:center;">参数描述</th>
-								<th style="text-align:center;">类型</th>
-								<th style="text-align:center;">长度</th>
-								<th style="text-align:center;">必填</th>
-							</tr>
-							<tr v-for="f in item.params">
-								<td style="padding-left:5px;padding-right:5px;">{{f.name}}</td>
-								<td style="padding-left:5px;padding-right:5px;">{{f.description}}</td>
-								<td style="padding-left:5px;padding-right:5px;width:70px;text-align:center;">{{f.type}}</td>
-								<td style="padding-left:5px;padding-right:5px;width:70px;text-align:center;">{{f.length}}</td>
-								<td style="padding-left:5px;padding-right:5px;width:70px;text-align:center;">{{f.notnull}}</td>
-							</tr>
-							<tr v-if="item.params.length==0">
-								<td colspan="5" style="text-align:center;">无参数</td>
-							</tr>
-						</table>
-					</div>
-						<div style="padding:10px;font-size:14px;">
-							<span style="color:#f00">返回示例:&nbsp;</span>
-							<span v-html="item.result"></span>
+				<collapse accordion simple>
+					<panel v-for="item in selectAction.methods" :name="item.path">
+						{{item.title}} - {{item.description}}
+						<div slot="content">
+						<card padding="0">
+							<table style="width:100%;margin:6px 0;" cellspacing="0" cellpadding="0" border="0">
+								<tr>
+									<td style="padding-left:10px;"> {{item.path}}</td>
+									<td style="width:100px;text-align:center;">权限: {{item.permission}}</td>
+									<td style="width:100px;text-align:center;"><i-button type="primary" size="small" @click.native="showTestModal(item.title,item.path)">测试</i-button></td>
+								</tr>
+							</table>
+							<div class="ivu-table-wrapper ivu-table-small">
+								<table class="ivu-table ivu-table-small" style="width:100%" cellspacing="0" cellpadding="0" border="0">
+									<tr>
+										<th style="text-align:center;">参数名称</th>
+										<th style="text-align:center;">参数描述</th>
+										<th style="text-align:center;">类型</th>
+										<th style="text-align:center;">长度</th>
+										<th style="text-align:center;">必填</th>
+									</tr>
+									<tr v-for="f in item.params">
+										<td style="padding-left:5px;padding-right:5px;">{{f.name}}</td>
+										<td style="padding-left:5px;padding-right:5px;">{{f.description}}</td>
+										<td style="padding-left:5px;padding-right:5px;width:70px;text-align:center;">{{f.type}}</td>
+										<td style="padding-left:5px;padding-right:5px;width:70px;text-align:center;">{{f.length}}</td>
+										<td style="padding-left:5px;padding-right:5px;width:70px;text-align:center;">{{f.notnull}}</td>
+									</tr>
+									<tr v-if="item.params.length==0">
+										<td colspan="5" style="text-align:center;">无参数</td>
+									</tr>
+								</table>
+							</div>
+							<div style="padding:10px;font-size:14px;">
+								<span style="color:#f00">返回示例:&nbsp;</span>
+								<span v-html="item.result"></span>
+							</div>
+						</card>
 						</div>
-					</card>
-				</template>
+					</panel>
+				</collapse>
 			</div>
 			<div id="model${key}">
 				<div style="font-size:14px;line-height:30px;">

@@ -17,7 +17,7 @@
 ::-webkit-scrollbar-button{background: #f6f6f6;}
 ::-webkit-scrollbar-button{display:none;}
 ::-webkit-scrollbar-track{background: #f6f6f6;}
-::-webkit-scrollbar-thumb{background: #bbb;border-radius:4px;}
+::-webkit-scrollbar-thumb{background: #bbb;}
 ::-webkit-scrollbar-thumb:hover{background: #2d8cf0;}
 ::-webkit-scrollbar-corner{background: #f6f6f6;}
 

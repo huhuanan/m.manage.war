@@ -1359,15 +1359,26 @@ Vue.component('json-item', {
 				}
 			},
 			sortHandler:function(column){
+				var odr;
 				if(column.order=='asc'){
 					this.param['order.name']=column.key;
 					this.param['order.oper']=column.order;
+					odr=column.order;
 				}else if(column.order=='desc'){
 					this.param['order.name']=column.key;
 					this.param['order.oper']=column.order;
+					odr=column.order;
 				}else{
 					this.param['order.name']='';
 					this.param['order.oper']='';
+				}
+				for(var key in this.allColumns){
+					var item=this.allColumns[key];
+					if(item.field==column.key&&odr){
+						item.sortType=odr;
+					}else{
+						item.sortType=null;
+					}
 				}
 				this.query();
 			},
