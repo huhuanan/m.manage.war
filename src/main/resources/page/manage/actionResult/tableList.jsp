@@ -8,7 +8,7 @@
 		<c:if test="${!empty map.openKey&&!empty map.title}"><h3>${map.title }</h3></c:if>
 		<div style="${fn:length(map.vulist.top)>0?'margin-bottom:10px;':'' }"><c:forEach var="vui" items="${map.vulist.top }">${vui }</c:forEach></div>
 		<div style="${map.openMode=='INNER'?'text-align:right;':'' }">
-		<button-group style="margin-bottom:10px;" >
+		<button-group style="margin-bottom:10px;margin-right:10px;${map.openMode=='PAGE'||!map.hiddenQueryList?'':'display:none;'}" >
 		<c:if test="${map.openMode=='PAGE' }">
 			<i-button type="default" @click="back(false)"><i class="iconfont">&#xe718;</i>&nbsp;返回&nbsp;</i-button>
 		</c:if>
@@ -79,9 +79,8 @@
 				</div>
 			</modal>
 		</c:if>
-			<i-button type="default" @click="query"><i class="iconfont">&#xe6aa;</i>&nbsp;刷新&nbsp;</i-button>
 		</button-group>
-		<button-group style="margin-left:10px;margin-bottom:10px;">
+		<button-group v-if="tableButtons.length>0&&tableDropButtons.length>0" style="margin-bottom:10px;">
 			<i-button v-for="item in tableButtons" :key="item.title" :type="item.style" @click="toolsHandler(item.param)"><i class="iconfont" v-html="item.icon"></i>&nbsp;<span>{{item.title}}</span>&nbsp;</i-button>
 			<i-button v-for="item in tableDropButtons" :key="item.title" :type="item.style">
 				<dropdown @on-click="toolsHandler(item.buttons[$event].param)" :transfer="true">
@@ -109,7 +108,10 @@
 			:show-summary="null!=countData" :summary-method="summaryMethod" :span-method="spanMethod" @on-row-click="rowClickHandler"></i-table>
 		</div>
 		<div style="${map.openMode=='INNER'?'text-align:right;':'' }">
-		<page style="margin-top:10px;" size="small" :total="count" :current="param.pageNo" :page-size="param.pageNum" show-elevator show-total show-sizer transfer @on-change="changePageNo" @on-page-size-change="changePageNum"></page>
+		<page style="margin-top:10px;" :total="count" :current="param.pageNo" :page-size="param.pageNum" show-elevator show-total show-sizer transfer @on-change="changePageNo" @on-page-size-change="changePageNum">
+			<i-button type="default" @click="query"><i class="iconfont">&#xe6aa;</i>&nbsp;刷新&nbsp;</i-button>
+			&nbsp;共 {{count}} 条
+		</page>
 		</div>
 		<div style="${fn:length(map.vulist.bottom)>0?'margin-top:10px;':'' }"><c:forEach var="vui" items="${map.vulist.bottom }">${vui }</c:forEach></div>
 	</div>
