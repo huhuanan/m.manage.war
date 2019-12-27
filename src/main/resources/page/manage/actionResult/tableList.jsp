@@ -80,7 +80,7 @@
 			</modal>
 		</c:if>
 		</button-group>
-		<button-group v-if="tableButtons.length>0&&tableDropButtons.length>0" style="margin-bottom:10px;">
+		<button-group v-if="tableButtons.length>0||tableDropButtons.length>0" style="margin-bottom:10px;">
 			<i-button v-for="item in tableButtons" :key="item.title" :type="item.style" @click="toolsHandler(item.param)"><i class="iconfont" v-html="item.icon"></i>&nbsp;<span>{{item.title}}</span>&nbsp;</i-button>
 			<i-button v-for="item in tableDropButtons" :key="item.title" :type="item.style">
 				<dropdown @on-click="toolsHandler(item.buttons[$event].param)" :transfer="true">

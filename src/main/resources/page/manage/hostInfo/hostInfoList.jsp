@@ -6,7 +6,7 @@
 	<i-table :columns="columns" :data="data" width="100%" size="small"></i-table>
 	<modal v-model="showCache" :footer-hide="true" :width="1000">
 		<tabs value="cacheHost" :animated="false">
-			<span slot="extra" style="line-height:35px;">主机:{{model.ip}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<span slot="extra" style="line-height:35px;">主机:{{model.ipport}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 			<tab-pane v-if="selectHost>=0" label="主机缓存" name="cacheHost">
 				<row>
 					<i-col :span="6">
@@ -74,10 +74,11 @@
 			return{
 				columns: [
 					{title: 'ID',key: 'oid',align:'center'},
-					{title: 'IP',key: 'ip',align:'center'},
+					{title: 'IPPORT',key: 'ipport',align:'center'},
 					{title: 'JVM内存',key: 'memory',align:'center'},
 					{title: 'db链接',key: 'dbLinkNum',align:'center'},
-					{title: '',key: 'createDate',align:'center'},
+					{title: '创建时间',key: 'createDate',align:'center'},
+					{title: '最后链接',key: 'lastDate',align:'center'},
 				],
 				data:[],
 				model:{},
@@ -94,8 +95,8 @@
 		},
 		mounted:function(){
 			<c:forEach var="item" items="${list}">
-			this.data.push({oid:'${item.oid }',ip:'${item.ip }',memory:'${item.freeMemory} / ${item.totalMemory} / ${item.maxMemory}',dbLinkNum:'${item.dbUseLinkNum} / ${item.dbMaxLinkNum}',
-				createDate:'${mc:toFormatStyle(item.createDate,"yyyy-MM-dd HH:mm")}'});
+			this.data.push({oid:'${item.oid }',ipport:'${item.ipport }',memory:'${item.freeMemory} / ${item.totalMemory} / ${item.maxMemory}',dbLinkNum:'${item.dbUseLinkNum} / ${item.dbMaxLinkNum}',
+				createDate:'${mc:toFormatStyle(item.createDate,"yyyy-MM-dd HH:mm")}',lastDate:'${mc:toFormatStyle(item.lastDate,"yyyy-MM-dd HH:mm")}'});
 			</c:forEach>
 		},
 		methods:{

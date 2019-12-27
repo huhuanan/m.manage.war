@@ -23,7 +23,7 @@
 		<row :gutter="16" :style="{marginRight:'${row.marginRight }px',marginBottom:'${index.last?-18:0 }px',minWidth:'${row.minWidth }px'}">
 			<c:forEach var="field" items="${row.fields}">
 			<c:if test="${field.type!='HIDDEN' }">
-			<i-col span="${field.span }" v-if="(!('${field.nullHidden }'&&(null==fields['${field.nullHidden }']||''==fields['${field.nullHidden }'])))&&((!'${field.hiddenField }'||'${field.hiddenValues }'.indexOf(fields['${field.showField }'])<0)&&(!'${field.showField}'||'${field.showValues }'.indexOf(fields['${field.showField }'])>=0))">
+			<i-col span="${field.span }" v-if="(!('${field.nullHidden }'&&(null==fields['${field.nullHidden }']||''==fields['${field.nullHidden }'])))&&((!'${field.hiddenField }'||'${field.hiddenValues }'.indexOf(fields['${field.hiddenField }'])<0)&&(!'${field.showField}'||'${field.showValues }'.indexOf(fields['${field.showField }'])>=0))">
 			<c:if test="${field.message!='' }"><tooltip max-width="350" placement="top"><div slot="content">{{convertMessage(${field.message })}}</div></c:if>
 				<form-item label="${field.title }" ${field.required?'required':'' } style="margin-bottom:18px;" :label-width="${field.titleWidth }">
 				<c:if test="${field.type=='ALERT' }">
@@ -151,7 +151,8 @@
 	</card>
 	<form-item label=" " style="width:100%;${map.openMode=='MODAL'?'text-align:right;':'' }${map.openMode=='PAGE'?'margin-bottom:15px;':'margin-bottom:0px;' }" :label-width="116">
 		<c:forEach var="btn" items="${map.formButtons}">
-			<i-button type="${btn.style}" @click="submitHandler" :disabled="'${btn.operField }'&&'${btn.operValues }'.indexOf(fields['${btn.operField }'])<0?true:false">
+			<i-button type="${btn.style}" @click="submitHandler" :disabled="'${btn.operField }'&&'${btn.operValues }'.indexOf(fields['${btn.operField }'])<0?true:false"
+				 v-if="(!('${btn.nullHidden }'&&(null==fields['${btn.nullHidden }']||''==fields['${btn.nullHidden }'])))&&((!'${btn.hiddenField }'||'${btn.hiddenValues }'.indexOf(fields['${btn.hiddenField }'])<0)&&(!'${btn.showField}'||'${btn.showValues }'.indexOf(fields['${btn.showField }'])>=0))">
 				<i class="iconfont">${btn.icon }</i>&nbsp;<span class="n-btn_title">${btn.title}</span>&nbsp;
 			</i-button>
 		</c:forEach>

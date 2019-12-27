@@ -1184,7 +1184,8 @@ Vue.component('json-item', {
 						var btn=buttons[i];btnObject[btn.title]=btn;
 						if((!btn.hiddenField||btn.hiddenValues.indexOf(row[btn.hiddenField])<0)
 								&&(!btn.showField||btn.showValues.indexOf(row[btn.showField])>=0)){
-							arr.push(h('i-button', {props: {type: btn.style,size: 'small'},domProps:{innerHTML:'<i class="iconfont">'+btn.icon+'</i>&nbsp;<span>'+btn.title+'</span>&nbsp;'},
+							arr.push(h('i-button', {props: {type: btn.style,size: 'small',disabled:(btn.operField&&btn.operValues.indexOf(row[btn.operField])<0?true:false)},
+									domProps:{innerHTML:'<i class="iconfont">'+btn.icon+'</i>&nbsp;<span>'+btn.title+'</span>&nbsp;'},
 								on: {click:function(e){var ele=$(e.srcElement);ele=ele.attr("type")=="button"?ele:ele.parent();self.inlineHandler(btnObject[ele.find("span").text()].param,row);}}
 							}, ''));
 						}
@@ -1196,9 +1197,10 @@ Vue.component('json-item', {
 							var db=dbtn.buttons[n];btnObject[dbtn.title+db.title]=db;
 							if((!db.hiddenField||db.hiddenValues.indexOf(row[db.hiddenField])<0)
 									&&(!db.showField||db.showValues.indexOf(row[db.showField])>=0)){
+								var flag=db.operField&&db.operValues.indexOf(row[db.operField])<0?true:false;
 								ds.push(h('dropdown-item',
-									{props:{name:dbtn.title+db.title},
-										domProps:{innerHTML:'<i class="iconfont">'+db.icon+'</i>&nbsp;<span style="color:'+this.fn_color(db.style)+';">'+db.title+'</span>&nbsp;'}
+									{props:{name:dbtn.title+db.title,disabled:flag},
+										domProps:{innerHTML:'<i class="iconfont">'+db.icon+'</i>&nbsp;<span style="color:'+(flag?'':this.fn_color(db.style))+';">'+db.title+'</span>&nbsp;'}
 									},
 								''));
 							}
