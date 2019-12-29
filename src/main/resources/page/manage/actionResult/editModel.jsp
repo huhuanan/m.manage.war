@@ -25,7 +25,7 @@
 			<c:if test="${field.type!='HIDDEN' }">
 			<i-col span="${field.span }" v-if="(!('${field.nullHidden }'&&(null==fields['${field.nullHidden }']||''==fields['${field.nullHidden }'])))&&((!'${field.hiddenField }'||'${field.hiddenValues }'.indexOf(fields['${field.hiddenField }'])<0)&&(!'${field.showField}'||'${field.showValues }'.indexOf(fields['${field.showField }'])>=0))">
 			<c:if test="${field.message!='' }"><tooltip max-width="350" placement="top"><div slot="content">{{convertMessage(${field.message })}}</div></c:if>
-				<form-item label="${field.title }" ${field.required?'required':'' } style="margin-bottom:18px;" :label-width="${field.titleWidth }">
+				<form-item label="${field.title }" ${field.required?'required':'' } style="margin-bottom:18px;min-height:33px;" :label-width="${field.titleWidth }">
 				<c:if test="${field.type=='ALERT' }">
 					<c:if test="${!empty field.alert}">
 						<alert show-icon type="${field.alert.type }" style="margin:0;padding-right:8px;">{{convertMessage(${field.alert.title })}}
@@ -33,6 +33,10 @@
 							<c:if test="${!empty field.alert.desc}"><div slot="desc">{{convertMessage(${field.alert.desc })}}</div></c:if>
 						</alert>
 					</c:if>
+				</c:if><c:if test="${field.type=='LABEL' }">
+					<span>{{getLabelContent('${field.field }','${field.dateFormat }')}} ${field.suffix}</span>
+				</c:if><c:if test="${field.type=='HTML' }">
+					${field.html }
 				</c:if><c:if test="${field.type=='TEXT' }">
 					<i-input v-model="fields['${field.field }']" placeholder="${field.hint }" @on-blur="doClearField('${field.field }')" ${field.disabled?'disabled':'' }>
 						<c:if test="${!empty field.suffix}"><span slot="append">${field.suffix}</span></c:if>
@@ -53,7 +57,7 @@
 						<c:if test="${!empty field.numberUp }">:max="${field.numberUp}"</c:if> <c:if test="${!empty field.numberDown }">:min="${field.numberDown}"</c:if>
 						<c:if test="${!empty field.suffix}">:formatter="value=>`\${value}${field.suffix}`" :parser="value=>value.replace('${field.suffix}','')"</c:if>></input-number>
 				</c:if><c:if test="${field.type=='DATE'||field.type=='DATETIME' }">
-					<date-picker type="${field.type=='DATE'?'date':'datetime' }" :style="{width:'100%'}" v-model="fields['${field.field }']" format="${item.dateFormat }" placeholder="${field.hint }" :transfer="true" @on-change="doClearField('${field.field }');" ${field.disabled?'disabled':'' }></date-picker>
+					<date-picker type="${field.type=='DATE'?'date':'datetime' }" :style="{width:'100%'}" v-model="fields['${field.field }']" format="${field.dateFormat }" placeholder="${field.hint }" :transfer="true" @on-change="doClearField('${field.field }');" ${field.disabled?'disabled':'' }></date-picker>
 				</c:if><c:if test="${field.type=='SELECT' }">
 				<i-select ref="${field.field }" v-model="fields['${field.field }']" :filterable="true" :clearable="true" :transfer="true" @on-change="doClearField('${field.field }');" placeholder="${field.hint }" ${field.disabled?'disabled':'' }>
 					<i-option v-for="item in selectDatas['${field.field }']" :value="item.value" :key="item.value">{{ item.label }}</i-option>
@@ -230,7 +234,7 @@
 				<c:forEach var="field" items="${row.fields}">
 					this.requiredField['${field.field}']=${field.required};
 					this.clearField['${field.field}']='${field.clearField}';
-					<c:if test="${field.type=='SELECT'||field.type=='SELECT_NODE'||field.type=='CHECKBOX'||field.type=='RADIO'||field.type=='STEPS'||field.type=='TEXTAUTO'}">
+					<c:if test="${field.type=='LABEL'||field.type=='SELECT'||field.type=='SELECT_NODE'||field.type=='CHECKBOX'||field.type=='RADIO'||field.type=='STEPS'||field.type=='TEXTAUTO'}">
 						this.$set(this.selectDatas,"${field.field}",[]); this.$set(this.selectLabels,"${field.field}",[]);
 						<c:forEach var="op" items="${field.selectData}">this.selectDatas["${field.field}"].push({value:"${op[0] }",label:"${op[1] }"});this.selectLabels["${field.field}"].push("${op[1] }");</c:forEach>
 						<c:if test="${field.type=='SELECT_NODE'}">this.setCascaderValue("${field.field}");</c:if>

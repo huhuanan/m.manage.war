@@ -630,6 +630,29 @@ Vue.component('json-item', {
 					if(obj[f]) this.execSelectMethod(f);
 				}
 			},
+			getLabelContent:function(f,dateFormat){
+				console.log(f,dateFormat,this.selectDatas[f]);
+				var v=this.fields[f];
+				if(dateFormat){
+					if(v){
+						return new Date(v).format(dateFormat);
+					}else{
+						return "";
+					}
+				}
+				if(!this.selectDatas[f]) return v;
+				var t="";
+				for(var i=0;i<this.selectDatas[f].length;i++){
+					var sd=this.selectDatas[f][i];
+					if(sd.value==v){
+						t=sd.label;
+					}
+				}
+				if((!this.selectMethod[f])&&(!t)&&this.selectDatas[f].length==0){
+					t=v;
+				}
+				return t;
+			},
 			execSelectMethod:function(f){
 				var method=this.selectMethod[f];
 				if(method){
