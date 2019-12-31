@@ -58,4 +58,10 @@
 		<function-class>m.system.util.NumberUtil</function-class>  
 		<function-signature>java.lang.Double floor(java.lang.Double,java.lang.Integer)</function-signature>
 	</function>
+	<!-- Object -->
+	<function>
+		<name>toJsString</name>  
+		<function-class>m.system.util.ObjectUtil</function-class>  
+		<function-signature>java.lang.String toString(java.lang.Object)</function-signature>
+	</function>
 </taglib>

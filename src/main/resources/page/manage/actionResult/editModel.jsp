@@ -6,7 +6,7 @@
 <%@ taglib uri="/WEB-INF/m_manage.tld" prefix="mm" %>
 <%@ taglib uri="/WEB-INF/dictionary.tld" prefix="dict" %>
 <page>
-	<h3 style="padding:0 5px 10px;"><c:if test="${map.openMode=='PAGE' }"><a @click="back(false)" ><i class="iconfont" style="font-size:23px;font-weight:100;">&#xe718;</i>&nbsp;&nbsp;</a></c:if>${map.formTitle }</h3>
+	<h3 style="padding:0 5px 10px;"><c:if test="${map.openMode=='PAGE' }"><a @click="back(false)" ><i class="iconfont" style="font-size:23px;font-weight:100;">&#xe718;</i>&nbsp;&nbsp;</a></c:if><span v-html='convertMessage(${mc:toJsString(map.formTitle) })'></span></h3>
 <i-form>
 	<card :style="{marginBottom:'15px',paddingBottom:'0px'}">
 	<c:set var="istab" value="${false}"></c:set>
@@ -24,7 +24,7 @@
 			<c:forEach var="field" items="${row.fields}">
 			<c:if test="${field.type!='HIDDEN' }">
 			<i-col span="${field.span }" v-if="(!('${field.nullHidden }'&&(null==fields['${field.nullHidden }']||''==fields['${field.nullHidden }'])))&&((!'${field.hiddenField }'||'${field.hiddenValues }'.indexOf(fields['${field.hiddenField }'])<0)&&(!'${field.showField}'||'${field.showValues }'.indexOf(fields['${field.showField }'])>=0))">
-			<c:if test="${field.message!='' }"><tooltip max-width="350" placement="top"><div slot="content">{{convertMessage(${field.message })}}</div></c:if>
+			<c:if test="${field.message!='' }"><tooltip max-width="350" placement="top"><div slot="content" v-html='convertMessage(${field.message })'></div></c:if>
 				<form-item label="${field.title }" ${field.required?'required':'' } style="margin-bottom:18px;min-height:33px;" :label-width="${field.titleWidth }">
 				<c:if test="${field.type=='ALERT' }">
 					<c:if test="${!empty field.alert}">
