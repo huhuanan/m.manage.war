@@ -1341,6 +1341,9 @@ Vue.component('json-item', {
 							if(dd._count_row){
 								this.countData=dd;
 							}else{
+								for(var n=0;n<this.allColumns.length;n++){
+									dd[this.allColumns[n].field]=dd[this.allColumns[n].key];
+								}
 								arr.push(dd);
 							}
 						}
@@ -1368,10 +1371,7 @@ Vue.component('json-item', {
 				this.selected=items;
 			},
 			rowClickHandler:function(rowItem,index){
-				this.row={};
-				for(var i=0;i<this.allColumns.length;i++){
-					this.row[this.allColumns[i].field]=rowItem[this.allColumns[i].key];
-				}
+				this.row=rowItem;
 			},
 			sortHandler:function(column){
 				var odr;

@@ -104,11 +104,32 @@
 			</c:if>
 		</div>
 		<div>
-		<i-table ref="itable" :loading="tableLoading" :height="tableHeight" :columns="columns" :data="datas" size="small" :stripe="false" :border="true" :highlight-row="true" @on-sort-change="sortHandler" @on-selection-change="selectHandler"
-			:show-summary="null!=countData" :summary-method="summaryMethod" :span-method="spanMethod" @on-row-click="rowClickHandler"></i-table>
+		<c:if test="${!map.cardMode }">
+			<i-table ref="itable" :loading="tableLoading" :height="tableHeight" :columns="columns" :data="datas" size="small" :stripe="false" :border="true" :highlight-row="true" @on-sort-change="sortHandler" @on-selection-change="selectHandler"
+				:show-summary="null!=countData" :summary-method="summaryMethod" :span-method="spanMethod" @on-row-click="rowClickHandler"></i-table>
+		</c:if>
+		<c:if test="${map.cardMode }">
+			<div class="masonry" style="column-count:${map.cardColNum};">
+				<div v-for="(row,m) in datas" class="masonry-item">
+					<c:if test="${empty map.cardHtml }">
+						<card :padding="3" style="padding-top:10px;padding-bottom:10px;">
+							<template v-for="(f,i) in columns">
+								<div :class="{'ivu-table-cell-ellipsis':f['ellipsis']}" :style="{padding:'3px 10px',lineHeight:'20px',display:(f['fixed']?'inline-block':'block'),float:(i===columns.length-1?'':f['fixed']),textAlign:f['align']}">
+									<span v-if="f['title']">{{f['title']}}&nbsp;</span>
+									<template v-if="f['colType']=='index'">{{m+1}}</template>
+									<template v-else-if="f['render']"><field-row :col="f" :row="row"></field-row></template>
+									<template v-else><span v-html="row[f.key]"></span></template>
+								</div>
+							</template>
+						</card>
+					</c:if>
+					<c:if test="${!empty map.cardHtml }">${map.cardHtml }</c:if>
+				</div>
+			</div>
+		</c:if>
 		</div>
 		<div style="${map.openMode=='INNER'?'text-align:right;':'' }">
-		<page style="margin-top:10px;" :total="count" :current="param.pageNo" :page-size="param.pageNum" show-elevator show-total show-sizer transfer @on-change="changePageNo" @on-page-size-change="changePageNum">
+		<page style="margin-top:10px;" :total="count" :current="param.pageNo" :page-size="param.pageNum" :page-size-opts="pageNums" show-elevator show-total show-sizer transfer @on-change="changePageNo" @on-page-size-change="changePageNum">
 			<i-button type="default" @click="query"><i class="iconfont">&#xe6aa;</i>&nbsp;刷新&nbsp;</i-button>
 			&nbsp;共 {{count}} 条
 		</page>
@@ -169,6 +190,18 @@
 						return html;
 					},
 				}
+			},
+			"field-row":{
+				render:function(h){
+					if(this.col&&this.col.render){
+						return this.col.render(h,{'column':this.col,'row':this.row});
+					}else if(this.col){
+						return h('span',{},this.row[this.col.key]);
+					}else{
+						return h('span',{},'列不存在');
+					}
+				},
+				props:['col','row'],
 			}
 		},
 		data(){
@@ -191,6 +224,7 @@
 				modalWidth:0,
 				param:[],
 				cascaders:{},
+				pageNums:${map.pageNums},
 				tableHeight:${map.tableHeight},
 				dataUrl:'${map.dataUrl}',
 				rowspanIndex:${map.rowspanIndex},
@@ -214,7 +248,7 @@
 		mounted:function(){
 			var param={};
 			param['pageNo']=1;
-			param['pageNum']=10;
+			param['pageNum']=this.pageNums[0];
 			var selectMethod={};
 			var selectDatas={};
 			var clearField={};
