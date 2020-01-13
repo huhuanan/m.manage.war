@@ -1342,7 +1342,9 @@ Vue.component('json-item', {
 								this.countData=dd;
 							}else{
 								for(var n=0;n<this.allColumns.length;n++){
-									dd[this.allColumns[n].field]=dd[this.allColumns[n].key];
+									if(this.allColumns[n].field!=this.allColumns[n].key&&this.allColumns[n].key.indexOf('-')<0){
+										dd[this.allColumns[n].field]=dd[this.allColumns[n].key];
+									}
 								}
 								arr.push(dd);
 							}
