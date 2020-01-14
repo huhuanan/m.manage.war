@@ -462,6 +462,11 @@ Vue.component('json-item', {
 			console.log(url,params);
 			var tpage=$.vuePage[url];
 			var exec=function(html){
+				if(html.indexOf("{")==0&&html.lastIndexOf("}")==html.length-1){
+					var json=jQuery.parseJSON(html);
+					pageVue.$Message.error(json.msg||'没有返回消息');
+					return;
+				}
 				var pageId=self.attr("id")||params.key;
 				var $html=$('<div>'+html+'</div>');
 				if($html.children('style').length){
