@@ -628,9 +628,9 @@ Vue.component('json-item', {
 				for(var f in this.selectMethod){
 					obj[f]=true;
 				}
-				for(var f in this.clearField){
-					obj[this.clearField[f]]=false;
-				}
+				//for(var f in this.clearField){
+				//	obj[this.clearField[f]]=false;
+				//}
 				for(var f in obj){
 					if(obj[f]) this.execSelectMethod(f);
 				}

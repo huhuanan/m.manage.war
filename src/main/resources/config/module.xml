@@ -2,6 +2,7 @@
 <root adminPage="manage/admin">
 	<power>
 		<operation name="manage_system_power" description="系统管理的权限"></operation>
+		<operation name="manage_flow_power" description="系统流程的权限"></operation>
 	</power>
 	<module oid="A" sort="0" name="系统设置" icoStyle="&#xe6ae;" isPublic="N">
 		<menu oid="A11" sort="111" name="系统用户" icoStyle="&#xe70b;" description="" isPublic="N">
@@ -12,6 +13,12 @@
 			<menu oid="A1105" sort="11105" name="操作日志" urlPath="action/manageSystemLog/toList?method=systemLogData" description="查询用户操作日志." isPublic="N"></menu>
 			<menu oid="A1106" sort="11106" name="系统信息" urlPath="action/manageSystemInfo/toEdit" description="设置系统信息" isPublic="N"></menu>
 			<menu oid="A1107" sort="11107" name="开发指南" urlPath="action/manageDeveloperGuide/toIndex" description="" isPublic="N"></menu>
+		</menu>
+	</module>
+	<module oid="I" sort="9" name="流程管理" icoStyle="&#xe6ae;" isPublic="N">
+		<menu oid="I11" sort="911" name="流程信息" icoStyle="&#xe70b;" description="" isPublic="N">
+			<menu oid="I1101" sort="91101" name="流程设置" urlPath="action/manageFlowDefine/toList?method=flowDefineData" description="" isPublic="N"></menu>
+			<menu oid="I1111" sort="91111" name="流程实例" urlPath="action/manageFlowInstance/toList?method=flowInstanceData" description="" isPublic="N"></menu>
 		</menu>
 	</module>
 </root>
