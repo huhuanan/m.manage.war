@@ -19,26 +19,28 @@ var wxUtil={
 	}
 };
 $(function(){
-	wx.ready(function(){
-		wxUtil.isWechat=true;
-	});
-	wx.error(function(res){
-	});
-	$.execJSON("action/appApi/getWxConfig",
-		{"url":location.href.split('#')[0]},
-		function(ele){
-			if(ele.code==0){
-				wx.config({
-					debug: false, // 
-					appId: ele.appId, // 
-					timestamp: ele.timestamp, // 
-					nonceStr: ele.nonceStr, //
-					signature: ele.signature,//
-					jsApiList: wxUtil.jsApiList
-				});
-			}else{
-				console.log(ele.msg);
+	if(wx){
+		wx.ready(function(){
+			wxUtil.isWechat=true;
+		});
+		wx.error(function(res){
+		});
+		$.execJSON("action/appApi/getWxConfig",
+			{"url":location.href.split('#')[0]},
+			function(ele){
+				if(ele.code==0){
+					wx.config({
+						debug: false, // 
+						appId: ele.appId, // 
+						timestamp: ele.timestamp, // 
+						nonceStr: ele.nonceStr, //
+						signature: ele.signature,//
+						jsApiList: wxUtil.jsApiList
+					});
+				}else{
+					console.log(ele.msg);
+				}
 			}
-		}
-	);
+		);
+	}
 });
