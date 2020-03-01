@@ -1,0 +1,123 @@
+<page>
+	<h3>选择机构</h3>
+	<card padding="0">
+		<div style="max-height:500px;overflow-y:auto;overflow-x:hidden;padding:15px;">
+			<tree ref="selectTree" :data="dataList"></tree>
+		</div>
+	</card>
+	<div style="padding-top:10px;text-align:right;">
+		<tag v-if="checked" type="border" closable color="primary" @on-close="checked=''" size="medium">{{nodeMap[checked].name}}</tag>
+		<i-button type="primary" @click="selectOrg()">确定</i-button>
+		<i-button @click="close(false)">关闭</i-button>
+	</div>
+</page>
+<script>
+(function(){
+	return { //vue对象属性
+		data(){
+			return {
+				//key:'',
+				//openKey:'',
+				//selected:{},
+				//nodeGroup:'',
+				typeNames:{'A':'组','B':'角色','C':'机构'},
+				dataList:[
+					{oid:'',type:'A',title:'组',expand:true,children:[]},
+					{oid:'',type:'B',title:'角色',expand:true,children:[]},
+					{oid:'',type:'C',title:'机构',expand:true,children:[]}
+				],
+				checked:'',
+				dataType:{},//组类型
+				list:[],//机构构建使用
+				map:{},//机构构建使用
+				allGroup:{},//{组oid:组}
+				nodeMap:{},
+			};
+		},
+		mounted:function(){
+			this.nodeGroup=this.nodeGroup?(','+this.nodeGroup+','):('');
+			console.log(this.selected);
+			$.execJSON("action/manageAdminGroup/getList",
+				{},
+				function(json){
+					if(json.code==0){
+						for(let i=0;i<json.list.length;i++){
+							json.list[i]['title']=json.list[i].name;
+							json.list[i]['expand']=true;
+							if(this.isChecked(json.list[i].oid)) json.list[i].checked=true;
+							this.dataType[json.list[i].oid]=json.list[i].type;
+							if(!this.isNode(json.list[i])){
+								//不展示
+								continue;
+							}else if(json.list[i].type=='A'){
+								json.list[i].render=this.radioRender;
+								this.dataList[0].children.push(json.list[i]);
+							}else if(json.list[i].type=='B'){
+								json.list[i].render=this.radioRender;
+								this.dataList[1].children.push(json.list[i]);
+							}else{
+								this.map[json.list[i].oid]=json.list[i];
+							}
+							this.nodeMap[json.list[i].oid]=json.list[i];
+						}
+						this.dataList[2].children=this.list;
+						for(let k in this.map){
+							let group=this.map[k];
+							group['title']=group.name;
+							group['expand']=true;
+							if(group.parent&&group.parent.oid){
+								let parent=this.map[group.parent.oid];
+								if(!parent.children) parent.children=[];
+								group.render=this.radioRender;
+								parent.children.push(group);
+							}else{
+								this.list.push(group);
+							}
+						}
+					}else{
+						this.$Message.error(data.msg);
+					}
+				}.bind(this)
+			);
+		},
+		methods:{
+			isNode:function(item){
+				if(!this.nodeGroup||this.nodeGroup.indexOf(','+item.oid+',')>=0||this.nodeGroup.indexOf(','+item.num+',')>=0
+					||(item.parent.oid&&this.nodeGroup.indexOf(','+item.parent.oid+',')>=0)
+					||(item.parent.num&&this.nodeGroup.indexOf(','+item.parent.num+',')>=0)){
+					return true;
+				}
+				return false;
+			},
+			radioRender:function(h,params){
+				let _this=this;
+				return h('radio-group',{props:{'value':_this.checked},on:{input:function(event){_this.checked=event;}}},
+					[h("radio",{props:{label:params.data.oid},style:{margin:'0'}},params.data.title)]
+				);
+			},
+			isChecked:function(oid){
+				for(let i=0;i<this.selected.length;i++){
+					if(this.selected[i]&&this.selected[i].oid==oid){
+						return true;
+					}
+				}
+				return false;
+			},
+			selectOrg:function(){
+				let obj=null;
+				if(this.checked){
+					let tmp=this.nodeMap[this.checked];
+					obj={oid:tmp.oid,name:tmp.name};
+				}
+				$.vue[this.openKey].backHandler(true,obj);
+			},
+			close:function(b){
+				$.vue[this.openKey].backHandler(b);
+			}
+			//backHandler:function(success,msg){//打开窗体的回调
+			//}
+		}
+	};
+})();
+</script>
+

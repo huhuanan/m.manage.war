@@ -1,0 +1,243 @@
+<page>
+	<h3>流程：{{model.name}} ( {{model.identity}} ) 版本：{{model.version}}</h3>
+	<card>
+	<row type="flex" justify="center" align="middle">
+		<i-col span="24" style="width:700px;">
+			<row type="flex" justify="center" align="middle" style="margin-bottom:50px;">
+				<i-col span="8"></i-col>
+				<i-col span="3" :id="'flow_start_'+key" style="text-align:center;">
+					<avatar size="large" shape="circle" style="background:#19be6b;">开始</avatar>
+				</i-col>
+				<i-col span="8"></i-col>
+			</row>
+			<template v-for="row in rows">
+			<row v-if="row.length>0" type="flex" justify="center" align="middle" style="margin-bottom:50px;">
+				<template v-for="col in row">
+				<i-col span="1"></i-col>
+				<i-col span="6" :id="col.oid+'_'+key">
+					<poptip trigger="hover" :disabled="!instanceOid">
+						<card padding="5" :style="{border:(insSecExe[col.oid]?'1px solid #2d8cf0':'1px solid #dcdee2'),width:'175px'}">
+							<table style="min-height:42px;">
+								<tr>
+									<td>
+										<icon v-if="col.countersign=='Y'" type="ios-contacts" size="30" color="#2d8cf0" />
+										<icon v-else type="ios-contact" size="30" color="#2d8cf0" />
+									</td>
+									<td>{{col.name}}</td>
+									<td v-if="col.forwardable=='Y'"><icon type="md-swap" size="20" color="#2d8cf0" /></td>
+								</tr>
+							</table>
+						</card>
+						<div slot="content">
+							<h5>{{insModel.business.title}}</h5>
+							<template v-for="item in insSec">
+							<div :style="{color:(col.oid==item.oid?'#2d8cf0':'#515a6e')}">
+								<span style="display:inline-block;min-width:40px;">{{item.index}}{{col.oid==item.oid?' >':''}} </span>
+								<span style="display:inline-block;min-width:120px;">{{item.sec}} </span>
+								<span style="display:inline-block;min-width:120px;">{{item.user}} </span>
+								<span style="display:inline-block;min-width:80px;">{{item.todesc}} </span>
+								<span>{{item.date1}} - {{item.date2}}</span>
+							</div>
+							</template>
+						</div>
+					</poptip>
+				</i-col>
+				<i-col span="1"></i-col>
+				</template>
+			</row>
+			</template>
+			<row type="flex" justify="center" align="middle">
+				<i-col span="3" :id="'flow_end_'+key" style="text-align:center;">
+					<avatar size="large" shape="circle" style="background:#ed4014;">结束</avatar>
+				</i-col>
+			</row>
+		</i-col>
+	</row>
+	</card>
+	<div style="padding-top:10px;text-align:right;">
+		<i-button @click="close">关闭</i-button>
+	</div>
+</page>
+<script>
+(function(){
+	return { //vue对象属性
+		data(){
+			return {
+				//key:'',
+				//openKey:'',
+				//defineOid:'',
+				//instanceOid:'',
+				model:{},
+				list:[],
+				link:[],
+				rows:[],
+				lines:[],
+				useSec:{},
+				useSec1:{},
+				startOid:"",
+				jsPlumbIns:null,
+				jsPlumbReady:false,
+				insCol:[{title:'执行人',key:'user',width:80},{title:'接受时间',key:'date1'},{title:'完成时间',key:'date2'}],
+				insSec:[],
+				insSecExe:{},
+				insModel:{business:{}},
+			};
+		},
+		mounted:function(){
+			this.instanceOid=this.instanceOid||'';
+			$.execJSON("action/manageFlowDefine/getDefine",
+				{"model.oid":this.defineOid},
+				function(json){
+					if(json.code==0){
+						this.model=json.model;
+						this.list=json.list;
+						this.link=json.link;
+						this.initBlock();
+						this.$nextTick(function(){
+							this.initPlumbIns();
+						}.bind(this));
+						let insObj=[];
+						let insSecExeObj={};
+						if(this.instanceOid){
+							$.execJSON("action/manageFlowInstance/getInstance",
+								{"model.oid":this.instanceOid},
+								function(json){
+									for(let i=0;i<json.list.length;i++){
+										let inss=json.list[i];
+										insObj.push({oid:inss.flowSection.oid,index:inss.flowIndex,
+											sec:inss.flowSection.name,todesc:inss.toDesc,
+											user:(inss.org.name||'')+(inss.org.oid&&inss.user.oid?' / ':'')+(inss.user.realname||''),
+											date1:this.fn_formatDate(inss.acceptDate,'yyyy-MM-dd HH:mm'),
+											date2:this.fn_formatDate(inss.doneDate,'yyyy-MM-dd HH:mm')
+										});
+										insSecExeObj[inss.flowSection.oid]=true;
+									}
+									this.insSec=insObj;
+									this.insSecExe=insSecExeObj;
+									this.insModel=json.model;
+								}.bind(this)
+							);
+						}
+					}else{
+						this.$Message.error(json.msg);
+					}
+				}.bind(this)
+			);
+		},
+		methods:{
+			initBlock:function(){
+				if(this.model&&this.model.startSection&&this.model.startSection.oid){
+					this.startOid=this.model.startSection.oid;
+					let cells=[];
+					this.rows.push(cells);
+					let sec=this.getSection(this.startOid);
+					cells.push(sec);
+					this.lines.push(['flow_start',sec.oid,0,0,'']);
+					this.useSec[sec.oid]=0;
+					this.addRow(sec.oid,1);
+				}else{
+					this.$Message.error("未定义开始环节");
+				}
+			},
+			addRow:function(secOid,rowIndex){
+				if(this.rows.length<=rowIndex) this.rows.push([]);
+				let arr=this.getLinks(secOid);
+				for(let i=0;i<arr.length;i++){
+					let link=arr[i];
+					if(link.toSection&&link.toSection.oid){
+						let sec=this.getSection(link.toSection.oid);
+						let b=false;
+						if((this.useSec[link.toSection.oid]||-1)<0&&this.startOid!=sec.oid){
+							this.rows[rowIndex].push(sec);
+							this.useSec[sec.oid]=rowIndex;
+							this.useSec1[sec.oid]=this.rows[rowIndex].length-1;
+							b=true;
+						}
+						if(b||this.useSec[sec.oid]==this.useSec[secOid]){
+							this.lines.push([secOid,sec.oid,0,0,link.toDesc]);
+						}else{
+							this.lines.push([secOid,sec.oid,
+								Math.abs(this.useSec[sec.oid]-this.useSec[secOid]),
+								this.useSec1[secOid]==0?'Left':'Right',
+								link.toDesc
+							]);
+						}
+					}else if(link.isNext=='N'){
+						this.lines.push([secOid,'flow_end',0,0,link.toDesc]);
+					}
+				}
+				for(let i=0;i<this.rows[rowIndex].length;i++){
+					let sec=this.rows[rowIndex][i];
+					this.addRow(sec.oid,rowIndex+1);
+				}
+			},
+			getSection:function(secOid){
+				for(let i=0;i<this.list.length;i++){
+					let sec=this.list[i];
+					if(sec.oid==secOid){
+						return sec;
+					}
+				}
+				this.$Message.error("环节存在异常");
+			},
+			getLinks:function(secOid){
+				let arr=[];
+				for(let i=0;i<this.link.length;i++){
+					let link=this.link[i];
+					if(link.fromSection.oid==secOid){
+						arr.push(link);
+					}
+				}
+				return arr;
+			},
+			initPlumbIns:function(){
+				if(!this.jsPlumbIns){
+					this.jsPlumbReady=false;
+					this.jsPlumbIns = jsPlumb.getInstance();
+					jsPlumb.ready(function () {
+						this.jsPlumbReady=true;
+					}.bind(this));
+				}
+				if(this.jsPlumbReady){
+					for (let item of this.lines) {
+						this.jsPlumbIns.connect({
+							source: item[0]+'_'+this.key,
+							target: item[1]+'_'+this.key
+						}, this.getJsPlumbConfig(item))
+					}
+				}else{
+					setTimeout(function(){this.initPlumbIns();}.bind(this),100);
+				}
+			},
+			getJsPlumbConfig:function(item){
+				let anchor=['Left', 'Right', 'Top', 'Bottom', [0.2, 0, 0, -1], [0.8, 0, 0, -1], [0.2, 1, 0, 1], [0.8, 1, 0, 1]];
+				let connector=['StateMachine',{curviness:50,proximityLimit:80}];
+				if(item[2]>0){
+					anchor=[item[3]];
+					connector=['Bezier',{curviness:15+25*item[2]}];
+				}
+				if(item[0]=='flow_start'||item[1]=='flow_end'){
+					connector=['Bezier',{curviness:60}];
+				}
+				let overlays=[['Arrow', { width: 8, length: 16, location: 1 }]];
+				if(item[4]){
+					overlays.push(['Custom',{create:function(){return $('<p style="background:#fff;border:1px solid #999;border-radius:4px;color:#999;font-size:11px;padding:0 3px;">'+item[4]+'</p>');},location: 0.2}]);
+				}
+				return {
+					anchor: anchor,
+					connector: connector,
+					endpoint: 'Blank',
+					paintStyle: { stroke: '#999', strokeWidth: 1 },
+					overlays: overlays
+				};
+			},
+			close:function(){
+				$.vue[this.openKey].backHandler('');
+			}
+			//backHandler:function(success,msg){//打开窗体的回调
+			//}
+		}
+	};
+})();
+</script>
+

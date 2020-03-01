@@ -6,24 +6,29 @@
 <%@ taglib uri="/WEB-INF/m_manage.tld" prefix="mm" %>
 <%@ taglib uri="/WEB-INF/dictionary.tld" prefix="dict" %>
 <page>
-	<h3 style="padding:0 5px 10px;"><c:if test="${map.openMode=='PAGE' }"><a @click="back(false)" ><i class="iconfont" style="font-size:23px;font-weight:100;">&#xe718;</i>&nbsp;&nbsp;</a></c:if><span v-html='convertMessage(${mc:toJsString(map.formTitle) })'></span></h3>
+<div style="margin:0 0 -15px 0;">
+	<h3 style="padding:0 5px 10px;" v-if="'${map.formTitle}'||(${map.formTitleExpression})">
+		<c:if test="${map.openMode=='PAGE' }"><a @click="back(false)" ><i class="iconfont" style="font-size:23px;font-weight:100;">&#xe718;</i>&nbsp;&nbsp;</a></c:if>
+		<span v-if="'${map.formTitle}'" v-html='convertMessage(${mc:toJsString(map.formTitle) })'></span>
+		<span v-else v-html="${map.formTitleExpression}"></span>
+	</h3>
 <i-form>
-	<card :style="{marginBottom:'15px',paddingBottom:'0px'}">
+	<card :padding="0" :style="{marginBottom:'15px'}"><div style="padding:17px 17px 0 17px;">
 	<c:set var="istab" value="${false}"></c:set>
 	<c:forEach var="row" items="${map.formRows }" varStatus="index">
 			<c:if test="${row.tabs}"><c:if test="${istab}"></tab-pane></c:if><c:if test="${!istab}"><c:set var="istab" value="${true}"></c:set><row><i-col span="24"><tabs :style="{marginTop:'-13px'}" :animated="false"></c:if><tab-pane label="${empty row.tabTitle?'无标题':row.tabTitle }"></c:if>
 			<c:if test="${row.line}"><div style="margin-top:${row.tabs&&istab?'-5px':'-18px'};"><divider orientation="left" :style="{color:'#2d8cf0',margin:'${row.title!=''?'10':'15' }px 0'}">${row.title }</divider></div></c:if>
 		<c:if test="${!empty row.alert}">
-			<alert show-icon type="${row.alert.type }" style="margin-bottom:18px;padding-right:8px;">{{convertMessage(${row.alert.title })}}
+			<alert v-if="${row.showExpression}" show-icon type="${row.alert.type }" style="margin-bottom:18px;padding-right:8px;">{{convertMessage(${row.alert.title })}}
 				<c:if test="${!empty row.alert.icon}"><icon type="${row.alert.icon}" slot="icon"></icon></c:if>
 				<c:if test="${!empty row.alert.desc}"><div slot="desc">{{convertMessage(${row.alert.desc })}}</div></c:if>
 			</alert>
 		</c:if>
-		<c:forEach var="vui" items="${row.vulist }"><div style="margin:0 0 18px 0;">${vui }</div></c:forEach>
-		<row :gutter="16" :style="{marginRight:'${row.marginRight }px',marginBottom:'${index.last?-18:0 }px',minWidth:'${row.minWidth }px'}">
+		<c:forEach var="vui" items="${row.vulist }"><div v-if="${row.showExpression}" style="margin:0 0 18px 0;">${vui }</div></c:forEach>
+		<row :gutter="16" v-if="${row.showExpression}" :style="{marginRight:'${row.marginRight }px',minWidth:'${row.minWidth }px'}">
 			<c:forEach var="field" items="${row.fields}">
 			<c:if test="${field.type!='HIDDEN' }">
-			<i-col span="${field.span }" v-if="(!('${field.nullHidden }'&&(null==fields['${field.nullHidden }']||''==fields['${field.nullHidden }'])))&&((!'${field.hiddenField }'||'${field.hiddenValues }'.indexOf(fields['${field.hiddenField }'])<0)&&(!'${field.showField}'||'${field.showValues }'.indexOf(fields['${field.showField }'])>=0))">
+			<i-col span="${field.span }" v-if="${field.showExpression}&&(!('${field.nullHidden }'&&(null==fields['${field.nullHidden }']||''==fields['${field.nullHidden }'])))&&((!'${field.hiddenField }'||'${field.hiddenValues }'.indexOf(fields['${field.hiddenField }'])<0)&&(!'${field.showField}'||'${field.showValues }'.indexOf(fields['${field.showField }'])>=0))">
 			<c:if test="${field.message!='' }"><tooltip max-width="350" placement="top"><div slot="content" v-html='convertMessage(${field.message })'></div></c:if>
 				<form-item label="${field.title }" ${field.required?'required':'' } style="margin-bottom:18px;min-height:33px;" :label-width="${field.titleWidth }">
 				<c:if test="${field.type=='ALERT' }">
@@ -114,6 +119,11 @@
 					<c:forEach var="btn" items="${field.buttons}">
 						<i-button type="${btn.style}" @click="submitHandler"><i class="iconfont">${btn.icon }</i>&nbsp;<span class="n-btn_title">${btn.title}</span>&nbsp;</i-button>
 					</c:forEach>
+				</c:if><c:if test="${field.type=='SELECT_PAGE' }">
+					<span style="display:inline-block;">
+						<c:if test="${!field.disabled}"><i-button type="info" @click="openSelectPageModal('${field.field}','${field.selectPageUrl}'||${field.selectPageUrlExpression},${field.selectPageWidth})">选择</i-button></c:if>
+						${field.html }
+					</span>
 				</c:if>
 				</form-item>
 			<c:if test="${field.message!='' }"></tooltip></c:if>
@@ -140,10 +150,11 @@
 			</c:if>
 		</c:forEach>
 	</row>
-	<row :style="{marginRight:'${row.marginRight }px',marginBottom:'${index.last?-18:0 }px',minWidth:'${row.minWidth }px'}">
+	<row v-if="${row.showExpression}" :style="{marginRight:'${row.marginRight }px',minWidth:'${row.minWidth }px'}">
 		<c:forEach var="other" items="${row.others}">
 			<i-col span="24">
-			<div id="other_${other.title}_${key}" style="display:none;margin:0 0 10px 0;">
+			<divider v-if="'${other.title }'" orientation="left" :style="{margin:'0px 0 5px',color:'#2d8cf0'}">${other.title }</divider>
+			<div id="other_${other.title}_${key}" :data-url="${other.urlExpression}" style="display:none;margin:0 0 10px 0;">
 				<div id="other_${other.title}_${key}_content"></div>
 			</div>
 			</i-col>
@@ -152,32 +163,35 @@
 		<c:if test="${istab&&row.endTabs}"><c:set var="istab" value="${false}"></c:set></tabs></c:if>
 	</c:forEach>
 	<c:if test="${istab}"></tabs></i-col></row></c:if>
-	</card>
-	<form-item label=" " style="width:100%;${map.openMode=='MODAL'?'text-align:right;':'' }${map.openMode=='PAGE'?'margin-bottom:15px;':'margin-bottom:0px;' }" :label-width="116">
-		<c:forEach var="btn" items="${map.formButtons}">
-			<i-button type="${btn.style}" @click="submitHandler" :disabled="'${btn.operField }'&&'${btn.operValues }'.indexOf(fields['${btn.operField }'])<0?true:false"
-				 v-if="(!('${btn.nullHidden }'&&(null==fields['${btn.nullHidden }']||''==fields['${btn.nullHidden }'])))&&((!'${btn.hiddenField }'||'${btn.hiddenValues }'.indexOf(fields['${btn.hiddenField }'])<0)&&(!'${btn.showField}'||'${btn.showValues }'.indexOf(fields['${btn.showField }'])>=0))">
-				<i class="iconfont">${btn.icon }</i>&nbsp;<span class="n-btn_title">${btn.title}</span>&nbsp;
-			</i-button>
-		</c:forEach>
-		<c:if test="${!empty map.openKey}">
-			&nbsp;<i-button @click="back(false)">${map.openMode=='PAGE'?'返回':'关闭'}</i-button>
-		</c:if>
-	</form-item>
+	</div></card>
+	<c:if test="${fn:length(map.formButtons)>0||(!empty map.openKey)}">
+		<form-item label=" " style="width:100%;${map.openMode=='MODAL'?'text-align:right;':'' }margin-bottom:15px;" :label-width="116">
+			<c:forEach var="btn" items="${map.formButtons}">
+				<i-button type="${btn.style}" @click="submitHandler" :disabled="'${btn.operField }'&&'${btn.operValues }'.indexOf(fields['${btn.operField }'])<0?true:false"
+					v-if="${btn.showExpression}&&(!('${btn.nullHidden }'&&(null==fields['${btn.nullHidden }']||''==fields['${btn.nullHidden }'])))&&((!'${btn.hiddenField }'||'${btn.hiddenValues }'.indexOf(fields['${btn.hiddenField }'])<0)&&(!'${btn.showField}'||'${btn.showValues }'.indexOf(fields['${btn.showField }'])>=0))">
+					<i class="iconfont">${btn.icon }</i>&nbsp;<span class="n-btn_title">${btn.title}</span>&nbsp;
+				</i-button>
+			</c:forEach>
+			<c:if test="${!empty map.openKey}">
+				&nbsp;<i-button @click="back(false)">${map.openMode=='PAGE'?'返回':'关闭'}</i-button>
+			</c:if>
+		</form-item>
+	</c:if>
 </i-form>
 	<c:forEach var="other" items="${map.others}" varStatus="status">
-	<div id="other_${other.title}_${key}" style="display:none;margin:0 0 10px 0;">
-		<divider orientation="left" :style="{margin:'5px 0 5px',color:'#2d8cf0'}">
+	<div id="other_${other.title}_${key}" :data-url="${other.urlExpression}" style="display:none;margin:0 0 15px 0;">
+		<divider v-if="'${other.title }'" orientation="left" :style="{margin:'5px 0 5px',color:'#2d8cf0'}">
 			<c:if test="${map.openMode=='PAGE' }"><a @click="back(false)" ><i class="iconfont" style="font-size:20px;font-weight:100;">&#xe718;</i>&nbsp;&nbsp;</a></c:if>
 			${other.title }
 		</divider>
 		<div id="other_${other.title}_${key}_content"></div>
 	</div>
 	</c:forEach>
-	<c:forEach var="vui" items="${map.vulist }"><div style="margin:0 0 10px 0;">${vui }</div></c:forEach>
+	<c:forEach var="vui" items="${map.vulist }"><div style="margin:0 0 15px 0;">${vui }</div></c:forEach>
 	<modal v-model="showModal" :footer-hide="true" :width="modalWidth" :mask-closable="false" @on-cancel="handlerResult(backEvent,'MODAL',false)">
-		<div id="_table_modal_${key }"></div>
+		<div id="_table_modal_${key }" style="margin: 0 0 0 0;"></div>
 	</modal>
+</div>
 </page>
 <script>
 (function(){
@@ -187,6 +201,7 @@
 				//key:'',
 				//openKey:'',
 				openMode:'',
+				mode:'${map.openMode}',
 				fields1:{'model.color':''},
 				backEvent:'',
 				backSuccess:false,
@@ -227,6 +242,7 @@
 						</c:forEach>
 					</c:forEach>
 				},
+				selectPageField:''
 			};
 		},
 		mounted:function(){

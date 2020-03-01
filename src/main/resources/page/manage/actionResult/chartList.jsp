@@ -90,7 +90,7 @@
 	</div>
 	</transition>
 	<modal v-model="showModal" :footer-hide="true" :width="modalWidth" :mask-closable="false" @on-cancel="handlerResult(backEvent,'MODAL',false)">
-		<div id="_table_modal_${key }"></div>
+		<div id="_table_modal_${key }" style="margin: 0 0 0 0;"></div>
 	</modal>
 	<modal v-model="loadModal.show" :footer-hide="true" width="300" :closable="false">
 		<div style="text-align:center"><i-progress :percent="loadModal.percent"></i-progress></div>

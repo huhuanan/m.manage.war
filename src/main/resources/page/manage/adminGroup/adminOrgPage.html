@@ -1,0 +1,161 @@
+<page>
+	<row :gutter="10">
+		<i-col span="8">
+			<card padding="0">
+				<h4>机构</h4>
+				<div style="max-height:500px;overflow-y:auto;overflow-x:hidden;padding:10px;">
+					<tree :data="list" @on-select-change="selectTree"></tree>
+				</div>
+				<div style="text-align:right;margin:10px;">
+					<i-button @click="addGroup('')" type="primary" icon="ios-add" size="small">添加机构</i-button>
+				</div>
+			</card>
+		</i-col>
+		<i-col span="16">
+			<div :id="'_list_'+key"><div style="line-height:100px;text-align:center;">点击节点显示用户</div></div>
+		</i-col>
+	</row>
+	<modal v-model="showModal" :footer-hide="true" :width="650" :mask-closable="false" @on-cancel="backHandler(false)">
+		<div :id="'_modal_'+key"></div>
+	</modal>
+</page>
+<script>
+(function(){
+	return { //vue对象属性
+		data(){
+			return {
+				//key:'',
+				//openKey:'',
+				//type:'',
+				showModal:false,
+				selectOid:'',
+				list:[],
+				map:{}
+			};
+		},
+		mounted:function(){
+			this.initGroup();
+		},
+		methods:{
+			initGroup:function(){
+				$.execJSON("action/manageAdminGroup/getList",
+					{"model.type":this.type},
+					function(json){
+						if(json.code==0){
+							this.map={};
+							for(let i=0;i<json.list.length;i++){
+								this.map[json.list[i].oid]=json.list[i];
+							}
+							this.list=[];
+							for(let k in this.map){
+								let group=this.map[k];
+								group['title']=group.name+' - '+group.num;
+								group['expand']=true;
+								if(group.parent&&group.parent.oid){
+									group.render=this.nodeRender;
+									let parent=this.map[group.parent.oid];
+									if(!parent.children) parent.children=[];
+									parent.children.push(group);
+								}else{
+									group.render=this.treeRender;
+									this.list.push(group);
+								}
+							}
+						}else{
+							this.$Message.error(data.msg);
+						}
+					}.bind(this)
+				);
+			},
+			addGroup:function(parentOid){
+				$.loadVuePage($("#_modal_"+this.key),
+					"action/manageAdminGroup/toEditOrg",{'model.parent.oid':parentOid,'model.type':this.type,openKey:this.key,openMode:'MODAL'},
+					(function(vueObj,vueId){
+						this.showModal=true;
+					}).bind(this)
+				);
+			},
+			modGroup:function(oid){
+				$.loadVuePage($("#_modal_"+this.key),
+					"action/manageAdminGroup/toEditOrg",{'model.oid':oid,openKey:this.key,openMode:'MODAL'},
+					(function(vueObj,vueId){
+						this.showModal=true;
+					}).bind(this)
+				);
+			},
+			selectTree:function(oid){
+				this.selectOid=oid;
+				$.loadVuePage($("#_list_"+this.key),
+					"action/manageAdminLogin/toList",{'method':'groupAdminData','params[adminGroup.oid]':oid,openKey:this.key,openMode:'LIST'},
+					(function(vueObj,vueId){}).bind(this)
+				);
+			},
+			treeRender:function(h, obj){
+				let data=obj.data;
+				return h('span', {
+					style: {
+						display: 'inline-block',
+						width: '100%'
+					}
+				}, [
+					h('i', {
+						class:'iconfont',
+						style: {margin:'0 8px',fontSize:'18px',color:'#2d8cf0',cursor:'pointer'},
+						props:{class:'iconfont'},
+						domProps:{innerHTML:'&#xe69e;'},
+						on: {
+							click:function(){this.modGroup(data.oid);}.bind(this)
+						}
+					}),
+					h('span', {style:{lineHeight:'24px'}},data.title),
+					h('span', {
+						style: {display: 'inline-block',float:'right',marginRight:'8px'}
+					}, [
+						h('i-button', {
+							style: {marginRight:'8px'},
+							props:{size:'small',icon:'ios-add',type:'primary'},
+							on: {
+								click:function(){this.addGroup(data.oid);}.bind(this)
+							}
+						})
+					])
+				]);
+			},
+			nodeRender:function(h, obj){
+				let data=obj.data;
+				let flag=this.selectOid==data.oid;
+				return h('span', {
+					style: {display: 'inline-block',width: '100%',backgroundColor:flag?'#f0faff':''}
+				}, [
+					h('i', {
+						class:'iconfont',
+						style: {margin:'0 8px',fontSize:'18px',color:'#2d8cf0',cursor:'pointer'},
+						props:{class:'iconfont'},
+						domProps:{innerHTML:'&#xe69e;'},
+						on: {
+							click:function(){this.modGroup(data.oid);}.bind(this)
+						}
+					}),
+					h('a', {
+						style:{lineHeight:'24px',color:'#2d8cf0'},
+						on: {
+							click:function(){if(!flag)this.selectTree(data.oid);}.bind(this)
+						}
+					},(flag?'> ':'')+data.title)
+				]);
+			},
+			//close:function(){
+			//	$.vue[this.openKey].backHandler('');
+			//},
+			backHandler:function(success,msg){//打开窗体的回调
+				if(success){
+					this.initGroup();
+				}
+				this.showModal=false;
+				$('_modal_'+this.key).html("");
+			}
+		}
+	};
+})();
+</script>
+

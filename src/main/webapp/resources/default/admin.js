@@ -547,6 +547,9 @@ Vue.component('json-item', {
 							var arr=msg.split("|");
 							this.fields[arr[0]]=arr[1];
 							break;
+						case "selectPageBack":
+							this.fields[this.selectPageField]=eval(msg||'{}');
+							break;
 						case "BACK":
 							this.back(false);
 							break;
@@ -596,6 +599,19 @@ Vue.component('json-item', {
 				this.modalWidth=700;
 				$.loadVuePage($("#_table_modal_"+self.key),
 					"action/managePageUtil/selectMapPage",{"selected":this.fields[f],"field":f,edit:edit,openKey:this.key},
+					(function(vueObj,vueId){
+						self.showModal=true;
+					}).bind(this)
+				);
+			},
+			openSelectPageModal:function(f,url,width){
+				this.backEvent='selectPageBack';
+				this.openMode='MODAL';
+				var self=this;
+				this.modalWidth=width;
+				this.selectPageField=f;
+				$.loadVuePage($("#_table_modal_"+self.key),
+					url,{"selected":this.fields[f],openKey:this.key},
 					(function(vueObj,vueId){
 						self.showModal=true;
 					}).bind(this)
@@ -787,7 +803,7 @@ Vue.component('json-item', {
 							}else{
 								self.$Message.error(json.msg)
 							}
-						});
+						},true);
 					}else if("MODAL"==param.event){
 						self.modalWidth=param.width;
 						$.loadVuePage($("#_table_modal_"+self.key),
@@ -812,32 +828,26 @@ Vue.component('json-item', {
 				}else fn();
 			},
 			refreshOthers:function(){
-				for(var k in this.others){
-					var param=this.others[k];
-					var b=true;
-					var d={};
-					if(param.field){
-						if(param.valueField){
-							var vf="";
-							var vfarr=param.valueField.split("|");
-							for(var i=0;i<vfarr.length;i++){
-								var v=this.fields[vfarr[i]];
-								if(v){
-									vf+=(i!=0?"|":"")+v;
-								}else{
-									b=false;
-								}
-							}
-							d[param.field]=vf;
-						}else{
-							b=false;
+				for(let k in this.others){
+					let param=this.others[k];
+					let b=false;
+					let d={openMode:this.mode};
+					let fields=param.field;
+					let valueFields=param.valueField;
+					for(let n=0;n<fields.length;n++){
+						let field=fields[n];
+						let valueField=valueFields[n];
+						if(valueField){
+							d[field]=this.fields[valueField];
+							if(d[field]) b=true;
 						}
 					}
 					if(b){
 						$("#"+k+"_"+this.key).css("display","");
-						if(param.url){
+						let url=param.url||$("#"+k+"_"+this.key).data("url");
+						if(url){
 							$.loadVuePage($("#"+k+"_"+this.key+"_content"),
-								param.url,$.convertJSONData(param.url,d),
+								url,$.convertJSONData(url,d),
 								(function(vueObj,vueId){
 								}).bind(this)
 							);
@@ -1253,11 +1263,12 @@ Vue.component('json-item', {
 			statusRender:function(h,params,key){
 				if(params.row._count_row)return h('span', '');
 				var self=this;
-				var obj={value:params.row[key]=='0'?true:false};
+				var fk=key.replace(/\./g,'_');
+				var obj={value:params.row[fk]=='0'?true:false};
 				var sh=h('i-switch',{props:obj,
 					on:{"on-change":function(flag){
 						var method=flag?"doRecovery":"doDisable";
-						$.execJSON(self.dataUrl.substring(0,self.dataUrl.lastIndexOf("/")+1)+method,{"model.oid":params.row['oid']},function(json){
+						$.execJSON(self.dataUrl.substring(0,self.dataUrl.lastIndexOf("/")+1)+method,{"model.oid":params.row[fk.substring(0,fk.lastIndexOf('_'))+'_oid']},function(json){
 							if(json.code==0){
 								self.$Message.success(json.msg);
 							}else{
@@ -1405,8 +1416,8 @@ Vue.component('json-item', {
 				this.query();
 			},
 			initSort:function(){
-				for(var i=0;i<this.columns.length;i++){
-					var col=this.columns[i];
+				for(var i=0;i<this.allColumns.length;i++){
+					var col=this.allColumns[i];
 					if(col.sortType){
 						this.param['order.name']=col.key;
 						this.param['order.oper']=col.sortType;

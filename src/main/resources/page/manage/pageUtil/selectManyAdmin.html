@@ -1,31 +1,25 @@
 <page>
-	<h3>{{typeNames[adminGroup.type]}}（{{adminGroup.name}}）关联用户</h3>
+	<h3>选择用户</h3>
 	<card>
 		<row :gutter="10">
-			<i-col span="7">
+			<i-col span="8">
 					<div style="max-height:500px;overflow-y:auto;overflow-x:hidden;">
 						<tree ref="selectTree" :render="nodeRender" :data="dataList"></tree>
 					</div>
 			</i-col>
-			<i-col span="12">
+			<i-col span="16">
 				<i-table border :columns="tabCol" :data="tabData" size="small" max-height="500px" 
 					@on-select="onSelect(arguments[1].oid,true)" @on-select-cancel="onSelect(arguments[1].oid,false)"
 					@on-select-all="onSelectAll(true)" @on-select-all-cancel="onSelectAll(false)">
 				</i-table>
 			</i-col>
-			<i-col span="5">
-				<div style="max-height:500px;overflow-y:auto;overflow-x:hidden;">
-					已选：
-					<template v-for="dd in allData">
-						<tag v-if="dd._checked==true" closable @on-close="onSelect(dd.oid,false)">{{dd.name}}</tag>
-					</template>
-				</div>
-			</i-col>
 		</row>
 	</card>
 	<div style="padding-top:10px;text-align:right;">
-		确定要将已选用户关联到{{typeNames[adminGroup.type]}}（{{adminGroup.name}}）
-		<i-button type="primary" @click="save">确定关联</i-button>
+		<template v-for="dd in allData">
+			<tag v-if="dd._checked==true" type="border" closable color="primary" @on-close="onSelect(dd.oid,false)" size="medium">{{dd.name}}</tag>
+		</template>
+		<i-button type="primary" @click="selectAdmin()">确定</i-button>
 		<i-button @click="close(false)">关闭</i-button>
 	</div>
 </page>
@@ -36,18 +30,20 @@
 			return {
 				//key:'',
 				//openKey:'',
-				//adminGroupOid:'',
-				adminGroup:{},
+				//selected:{},
+				//nodeGroup:'',
+				//flterGroup:'',
 				typeNames:{'A':'组','B':'角色','C':'机构'},
 				dataList:[
-					{oid:'',type:'',title:'全部',expand:true},
-					{oid:'',type:'A',title:'组',expand:true,children:[]},
-					{oid:'',type:'B',title:'角色',expand:true,children:[]},
-					{oid:'',type:'C',title:'机构',expand:false,children:[]}
+					{oid:'all',type:'all',title:'全部',expand:true,list:[]},
+					{oid:'A',type:'A',title:'组',expand:true,children:[],list:[]},
+					{oid:'B',type:'B',title:'角色',expand:true,children:[],list:[]},
+					{oid:'C',type:'C',title:'机构',expand:false,children:[],list:[]}
 				],
 				dataType:{},//组类型
 				list:[],//机构构建使用
 				map:{},//机构构建使用
+				allGroup:{},//{组oid:组}
 				selectOid:'',
 				tabCol:[
 					{type: 'selection',width: 60,align: 'center'},
@@ -55,12 +51,17 @@
 					{title: '最后登陆时间',key: 'lastLoginTime'}
 				],
 				tabData:[],//table的数据
-				groupMap:{},//{组oid:[用户oid...]}
-				groupParent:{},//{组oid:组对应的parent.oid}
-				allData:{}//所有用户 {用户oid:{tableData}}
+				allData:{},//所有用户 {用户oid:{tableData}}
 			};
 		},
 		mounted:function(){
+			this.nodeGroup=this.nodeGroup?(','+this.nodeGroup+','):('');
+			this.flterGroup=this.flterGroup?(','+this.flterGroup+','):('');
+			console.log(this.selected);
+			this.allGroup[this.dataList[0].oid]=this.dataList[0];
+			this.allGroup[this.dataList[1].oid]=this.dataList[1];
+			this.allGroup[this.dataList[2].oid]=this.dataList[2];
+			this.allGroup[this.dataList[3].oid]=this.dataList[3];
 			$.execJSON("action/manageAdminGroup/getList",
 				{},
 				function(json){
@@ -69,16 +70,18 @@
 							json.list[i]['title']=json.list[i].name;
 							json.list[i]['expand']=true;
 							this.dataType[json.list[i].oid]=json.list[i].type;
-							if(json.list[i].type=='A'){
+							if(!this.isNode(json.list[i])){
+								//不展示
+								continue;
+							}else if(json.list[i].type=='A'){
 								this.dataList[1].children.push(json.list[i]);
 							}else if(json.list[i].type=='B'){
 								this.dataList[2].children.push(json.list[i]);
 							}else{
 								this.map[json.list[i].oid]=json.list[i];
 							}
-							if(this.adminGroupOid==json.list[i].oid){
-								this.adminGroup=json.list[i];
-							}
+							this.allGroup[json.list[i].oid]=json.list[i];
+							this.allGroup[json.list[i].oid].list=[];
 						}
 						this.dataList[3].children=this.list;
 						for(let k in this.map){
@@ -103,30 +106,37 @@
 				{adminGroupOid:this.adminGroupOid},
 				function(json){
 					if(json.code==0){
-						let map=json.map;
-						for(let i=0;i<json.allLink.length;i++){
-							let link=json.allLink[i];
-							if(!this.groupMap[link.adminGroup.oid]){
-								this.groupMap[link.adminGroup.oid]=[];
-							}
-							this.groupMap[link.adminGroup.oid].push(link.admin.oid);
-							if(link.adminGroup.parent&&link.adminGroup.parent.oid){
-								this.groupParent[link.adminGroup.oid]=link.adminGroup.parent.oid;
-							}
-						}
+						let allLink=json.allLink;
 						$.execJSON("action/manageAdminLogin/getAllAdmin",
-							{},
+							{nodeGroup:this.nodeGroup,flterGroup:this.flterGroup},
 							function(data){
 								if(data.code==0){
+									this.adminList=data.list;
 									for(let i=0,len=data.list.length;i<len;i++){
 										let dd=data.list[i];
 										this.allData[dd.oid]={
 											oid:dd.oid,username:dd.realname+' ('+dd.username+')',name:dd.realname,
 											lastLoginTime:dd.lastLoginTime?(dd.lastLoginTime+' ('+dd.loginCount+')'):'',
-											groupOid:dd.adminGroup.oid,_checked:map[dd.oid]
+											groupOid:dd.adminGroup.oid,_checked:this.isSelected(dd.oid)
 										};
+										if(dd.adminGroup&&dd.adminGroup.oid){
+											this.addGroupList(dd.adminGroup,this.allData[dd.oid]);
+											this.addParentList(dd.adminGroup.type,this.allData[dd.oid]);
+										}
+										this.addParentList('all',this.allData[dd.oid]);
 									}
-									this.initTabData('','',false);
+									for(let i=0;i<allLink.length;i++){
+										let link=allLink[i];
+										let user=this.allData[link.admin.oid];
+										if(user){
+											this.addGroupList(link.adminGroup,user);
+											if(link.adminGroup.parent&&link.adminGroup.parent.oid)
+												this.addParentList(link.adminGroup.parent.oid,user);
+											this.addParentList(link.adminGroup.type,user);
+										}
+									}
+									this.selectOid="allall";
+									this.tabData=this.allGroup['all'].list;
 								}else{
 									this.$Message.error(data.msg);
 								}
@@ -139,44 +149,41 @@
 			);
 		},
 		methods:{
-			initTabData:function(type,oid,isCheck){
-				this.selectOid=type+oid;
-				this.tabData=[];
-				if(type=='A'){
-					for(let i in this.allData){
-						if((!oid||this.allData[i].groupOid==oid)
-							&&type==this.dataType[this.allData[i].groupOid]){
-							this.addTableRow(i,isCheck);
-						}
-					}
-				}else if(type=='B'||type=='C'){
-					if(this.groupMap[oid]){
-						this.addTableData(type,oid,isCheck);
-					}else{
-						for(let p in this.groupParent){
-							if(!oid||this.groupParent[p]==oid){
-								this.addTableData(type,p,isCheck);
-							}
-						}
-					}
-				}else{
-					for(let i in this.allData){
-						this.addTableRow(i,isCheck);
-					}
+			isNode:function(item){
+				if(!this.nodeGroup||this.nodeGroup.indexOf(','+item.oid+',')>=0||this.nodeGroup.indexOf(','+item.num+',')>=0
+					||(item.parent.oid&&this.nodeGroup.indexOf(','+item.parent.oid+',')>=0)
+					||(item.parent.num&&this.nodeGroup.indexOf(','+item.parent.num+',')>=0)){
+					return true;
+				}
+				return false;
+			},
+			addGroupList:function(group,user){
+				let gg=this.allGroup[group.oid];
+				if(gg&&gg.oid){
+					gg.list.push(user);
+					this.addParentList(group);
 				}
 			},
-			addTableData:function(type,groupOid,isCheck){
-				if(type!=this.dataType[groupOid])
-					return;
-				for(let i=0;i<this.groupMap[groupOid].length;i++){
-					let k=this.groupMap[groupOid][i];
-					this.addTableRow(k,isCheck);
+			addParentList:function(groupOid,user){
+				let gg=this.allGroup[groupOid];
+				if(gg&&gg.oid){
+					for(let i=0;i<gg.list.length;i++){
+						if(gg.list[i].oid==user.oid){
+							return;
+						}
+					}
+					gg.list.push(user);
 				}
 			},
-			addTableRow:function(adminOid,isCheck){
-				if(!isCheck||this.allData[adminOid]._checked){
-					this.tabData.push(this.allData[adminOid]);
+			isSelected:function(oid){
+				if(this.selected&&this.selected.length>0){
+					for(let i=0;i<this.selected.length;i++){
+						if(this.selected[i]&&this.selected[i].oid==oid){
+							return true;
+						}
+					}
 				}
+				return false;
 			},
 			onSelect:function(adminOid,flag){
 				this.allData[adminOid]['_checked']=flag;
@@ -185,25 +192,6 @@
 				for(let i=0;i<this.tabData.length;i++){
 					this.tabData[i]['_checked']=flag;
 				}
-			},
-			save:function(){
-				var adminOids=[];
-				for(let i in this.allData){
-					if(this.allData[i]._checked){
-						adminOids.push(this.allData[i].oid);
-					}
-				}
-				$.execJSON("action/manageAdminGroupLink/setLink",
-					{"adminGroupOid":this.adminGroupOid,"adminOids":adminOids},
-					function(data){
-						if(data.code!=0){
-							this.$Message.error(data.msg);
-						}else{
-							this.$Message.success(data.msg);
-							this.close(true);
-						}
-					}.bind(this)
-				);
 			},
 			nodeRender:function(h, obj){
 				let data=obj.data;
@@ -214,10 +202,22 @@
 					h('a', {
 						style:{margin:'0 8px',lineHeight:'24px',color:'#2d8cf0'},
 						on: {
-							click:function(){this.initTabData(data.type,data.oid,false);}.bind(this)
+							click:function(){
+								this.selectOid=data.type+data.oid;
+								this.tabData=this.allGroup[data.oid].list;
+							}.bind(this)
 						}
 					},(flag?'> ':'')+data.title)
 				]);
+			},
+			selectAdmin:function(){
+				let arr=[];
+				for(let i=0;i<this.adminList.length;i++){
+					if(this.allData[this.adminList[i].oid]._checked){
+						arr.push(this.adminList[i]);
+					}
+				}
+				$.vue[this.openKey].backHandler(true,arr);
 			},
 			close:function(b){
 				$.vue[this.openKey].backHandler(b);

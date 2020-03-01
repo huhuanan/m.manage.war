@@ -9,16 +9,19 @@
 			<menu oid="A1101" sort="11101" name="权限组设置" urlPath="action/manageAdminGroup/toList?method=adminGroupData" description="系统角色的权限组,用于设置权限组的菜单权限和操作权限." isPublic="N"></menu>
 			<menu oid="A1102" sort="11102" name="管理员设置" urlPath="action/manageAdminLogin/toList?method=adminLoginData" description="设置可登录系统的操作员." isPublic="N"></menu>
 			<menu oid="A1103" sort="11103" name="角色设置" urlPath="action/manageAdminGroup/toList?method=adminRoleData" description="设置角色权限." isPublic="N"></menu>
-			<menu oid="A1104" sort="11104" name="字典设置" urlPath="action/manageDictionaryType/toList?method=dictionayTypeList" description="设置数据字典." isPublic="N"></menu>
-			<menu oid="A1105" sort="11105" name="操作日志" urlPath="action/manageSystemLog/toList?method=systemLogData" description="查询用户操作日志." isPublic="N"></menu>
-			<menu oid="A1106" sort="11106" name="系统信息" urlPath="action/manageSystemInfo/toEdit" description="设置系统信息" isPublic="N"></menu>
-			<menu oid="A1107" sort="11107" name="开发指南" urlPath="action/manageDeveloperGuide/toIndex" description="" isPublic="N"></menu>
+			<menu oid="A1104" sort="11104" name="机构设置" urlPath="page/manage/adminGroup/adminOrgPage.html?type=C" description="设置机构权限." isPublic="N"></menu>
+			<menu oid="A1105" sort="11105" name="字典设置" urlPath="action/manageDictionaryType/toList?method=dictionayTypeList" description="设置数据字典." isPublic="N"></menu>
+			<menu oid="A1106" sort="11106" name="操作日志" urlPath="action/manageSystemLog/toList?method=systemLogData" description="查询用户操作日志." isPublic="N"></menu>
+			<menu oid="A1107" sort="11107" name="系统信息" urlPath="action/manageSystemInfo/toEdit" description="设置系统信息" isPublic="N"></menu>
+			<menu oid="A1108" sort="11108" name="开发指南" urlPath="action/manageDeveloperGuide/toIndex" description="" isPublic="N"></menu>
 		</menu>
 	</module>
 	<module oid="I" sort="9" name="流程管理" icoStyle="&#xe6ae;" isPublic="N">
 		<menu oid="I11" sort="911" name="流程信息" icoStyle="&#xe70b;" description="" isPublic="N">
 			<menu oid="I1101" sort="91101" name="流程设置" urlPath="action/manageFlowDefine/toList?method=flowDefineData" description="" isPublic="N"></menu>
 			<menu oid="I1111" sort="91111" name="流程实例" urlPath="action/manageFlowInstance/toList?method=flowInstanceData" description="" isPublic="N"></menu>
+			<menu oid="I1121" sort="91121" name="我的待办" urlPath="action/manageFlowInstanceSection/toList?method=myTodoData" description="" isPublic="N"></menu>
+			<menu oid="I1122" sort="91122" name="业务状态" urlPath="action/manageFlowBusiness/toList?method=businessData" description="" isPublic="N"></menu>
 		</menu>
 	</module>
 </root>

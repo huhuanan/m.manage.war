@@ -2,10 +2,12 @@
 	<h3>菜单权限</h3>
 	<card>
 		<row :gutter="16">
-			<i-col :span="18">
+			<i-col :span="16">
 				<tree ref="selectTree" :data="dataList" :render="renderContent"></tree>
 			</i-col>
-			<i-col :span="6">
+			<i-col :span="8">
+				<divider>归属</divider>
+				<div v-for="item in groupList" :style="{lineHeight:'25px'}">({{typeNames[item.type]}}) {{item.parent.oid?(item.parent.name+' - '):''}}{{item.name}}</div>
 				<divider>权限</divider>
 				<div v-for="item in powerList" :style="{lineHeight:'25px'}">{{item}}</div>
 			</i-col>
@@ -23,14 +25,15 @@
 				//key:'',
 				//openKey:'',
 				//adminOid:'',
-				//adminGroupOid:'',
 				dataList:[],
-				powerList:[]
+				powerList:[],
+				typeNames:{'A':'组','B':'角色','C':'机构'},
+				groupList:[]
 			};
 		},
 		mounted:function(){
 			$.execJSON("action/manageGroupMenuLink/getModuleList4Admin",
-				{admin:{oid:this.adminOid,adminGroup:{oid:this.adminGroupOid}}},
+				{admin:{oid:this.adminOid}},
 				function(data){
 					if(data.code==0){
 						for(var k in data.modules){
@@ -56,8 +59,17 @@
 				{adminOid:this.adminOid},
 				function(data){
 					if(data.code==0){
-						console.log(data.powers);
 						this.powerList=data.powers;
+					}else{
+						this.$Message.error(data.msg);
+					}
+				}.bind(this),true
+			);
+			$.execJSON("action/manageAdminGroup/getGroup4Admin",
+				{adminOid:this.adminOid},
+				function(data){
+					if(data.code==0){
+						this.groupList=data.groupList;
 					}else{
 						this.$Message.error(data.msg);
 					}

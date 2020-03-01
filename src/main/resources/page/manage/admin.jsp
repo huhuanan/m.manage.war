@@ -147,17 +147,17 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				}
 			});
 			Vue.component('admin-nav-tags',{
-				template:`<div :style="{position:'fixed',zIndex:'998',top:'60px',left:menuExpansion?'200px':'75px',right:'1px',padding:'8px 8px',backgroundColor:'rgba(238,238,238,0.85)',overflow:'hidden',height:'46px',borderBottom:'solid 1px #ddd'}">
+				template:`<div :style="{position:'fixed',zIndex:'998',top:'60px',left:menuExpansion?'200px':'75px',right:'1px',padding:'8px 0px 0px 8px',backgroundColor:'rgba(238,238,238,0.85)',overflow:'hidden',height:'39px'}">
 					<slot name="first"></slot>
-					<dropdown transfer style="float:right;">
-						<i-button style="padding:0 10px;"><i class="iconfont" style="font-size:20px;">&#xe71b;</i></i-button>
-						<dropdown-menu slot="list">
-							<dropdown-item v-for="tag in tags" :key="tag" :name="tag" @click.native="doClick(tag,false)" :selected="active==tag"><span v-html="tagName[tag]"></span></dropdown-item>
-						</dropdown-menu>
-					</dropdown>
-					<tag v-for="tag in tags" :key="tag" type="dot" closable :color="active==tag?'primary':''" @click.native="doClick(tag,true)" @on-close="doClose(tag)" style="margin:0 8px 8px 0;">
-						<span v-html="tagName[tag]"></span>
-					</tag>
+					<tabs type="card" :closable="tags.length>1" :before-remove="beforeClose" :value="active" @on-click="doClick">
+						<tab-pane v-for="tag in tags" :label="tagName[tag]" :name="tag"></tab-pane>
+						<dropdown transfer slot="extra">
+							<i-button style="padding:0 10px;" type="text"><i class="iconfont" style="font-size:20px;">&#xe71b;</i></i-button>
+							<dropdown-menu slot="list">
+								<dropdown-item v-for="tag in tags" :key="tag" :name="tag" @click.native="doClick(tag)" :selected="active==tag"><span v-html="tagName[tag]"></span></dropdown-item>
+							</dropdown-menu>
+						</dropdown>
+					</tabs>
 				</div>`,
 				props:{
 					active:{type:String},
@@ -173,11 +173,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					}.bind(this));
 				},
 				methods:{
-					doClick:function(tag,flag){
-						this.$emit("on-click-tag",tag,flag);
+					doClick:function(tag){
+						this.$emit("on-click-tag",tag);
 					},
-					doClose:function(tag){
-						this.$emit("on-close-tag",tag);
+					beforeClose:function(i){
+						this.$emit("on-close-tag",this.tags[i]);
+						return new Promise(
+							function(resolve, reject) {
+								reject('tag click');
+							}
+						);
 					}
 				}
 				
@@ -192,30 +197,42 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div id="main_page" style="display: block;position: absolute;width: 100%;overflow: auto;" >
 			<admin-layout>
 				<admin-header slot="head" :modules="modules" :active="activeModule" @on-click-module="doModule">
-					<dropdown transfer style="float:right;">
-						<a href="javascript:void(0)">
-							<avatar :src="modelInfo.headImage.thumPath"></avatar>
-							<span v-html="modelInfo.realname"></span>&nbsp;&nbsp;&nbsp;
+					<dropdown transfer style="float:right;" trigger="click">
+						<a href="javascript:void(0)" style="height:60px;padding:10px;display:inline-block;">
+							<avatar :src="modelInfo.headImage.thumPath" style="vertical-align:baseline;"></avatar>
+							<span :style="{display:'inline-block','line-height':modelInfo.orgGroup&&modelInfo.orgGroup.oid?1.2:0.6}">
+								<span style="display:block;" v-html="modelInfo.realname"></span>
+								<small v-if="modelInfo.orgGroup&&modelInfo.orgGroup.oid" v-html="modelInfo.orgGroup.name"></small>
+								<small v-else>&nbsp;</small>
+							</span>
 						</a>
 						<dropdown-menu slot="list">
 							<dropdown-item @click.native="modify"><span v-html="'修改登陆信息'"></span></dropdown-item>
+							<dropdown v-if="modelInfo.orgGroup&&modelInfo.orgGroup.oid" placement="right-start" style="width:100%;">
+								<dropdown-item><span v-html="modelInfo.orgGroup.name"></span><icon type="ios-arrow-forward" style="float:right;margin-top:3px;"></icon></dropdown-item>
+								<dropdown-menu slot="list">
+									<template v-for="item in orgGroups">
+										<dropdown-item :selected="item.oid==modelInfo.orgGroup.oid" @click.native="setCurrentOrgGroup(item)"><span v-html="item.parent.name+' - '+item.name"></span></dropdown-item>
+									</template>
+								</dropdown-menu>
+							</dropdown>
 							<dropdown-item @click.native="logout" divided><span v-html="'退出登陆'"></span></dropdown-item>
 						</dropdown-menu>
 					</dropdown>
 				</admin-header>
 				<admin-menu slot="menu" :modules="modules" @on-click-menu="doOpenMenu" ></admin-menu>
 				<i-content :style="{padding: '0 10px 0 10px',overflowY:'hidden','background':'rgba(255,255,255,0.3)!important'}">
-					<admin-nav-tags :active="activeTag" :tags="tags" :tag-name="tagName" @on-click-tag="doOpenMenu(arguments[0],arguments[1])" @on-close-tag="doCloseMenu">
-						<i-button slot="first" style="margin:0 8px 8px -12px;float:left;padding:0 10px;" @click="setMenuExpansion">
+					<admin-nav-tags :active="activeTag" :tags="tags" :tag-name="tagName" @on-click-tag="doOpenMenu" @on-close-tag="doCloseMenu">
+						<i-button type="text" slot="first" style="margin:0 8px 8px -10px;padding:0 10px;float:left;" @click="setMenuExpansion">
 							<i class="iconfont" style="font-size:20px;" v-html="menuExpansion?'&#xe6b4;':'&#xe6b5;'"></i>
 						</i-button>
 					</admin-nav-tags>
-					<breadcrumb :style="{position:'absolute',top:'122px',right:'12px',textAlign:'right'}">
+					<breadcrumb :style="{position:'absolute',top:'118px',right:'12px',textAlign:'right'}">
 						<breadcrumb-item :style="{color:'#2d8cf0'}"><span v-html="breadcrumb3"></span></breadcrumb-item>
 						<breadcrumb-item><span v-html="breadcrumb2"></span></breadcrumb-item>
 						<breadcrumb-item><span v-html="breadcrumb1"></span></breadcrumb-item>
 					</breadcrumb>
-					<div id="main_content" style="margin:56px 0 10px 0;"></div>
+					<div id="main_content" style="margin:53px 0 10px 0;"></div>
 				</i-content>
 			</admin-layout>
 			<modal :mask-closable="false" :width="470" v-model="toModify" :footer-hide="true">
@@ -266,7 +283,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			$(document.body).ready(function(){
 				$.vue['main_admin']=new Vue({//主页面初始化
 					el:"#main_page",
-					data:{init:false,modelInfo:{headImage:{thumPath:''}},modules:[],menuMap:{},
+					data:{init:false,modelInfo:{headImage:{thumPath:''}},orgGroups:[],modules:[],menuMap:{},
 						toModify:false,tags:[],tagName:{},activeTag:'',currentMenuOid:'',
 						activeModule:'',breadcrumb1:'',breadcrumb2:'',breadcrumb3:'',
 						menuExpansion:true},
@@ -290,15 +307,31 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								self.toModify=true;
 							});
 						},
+						setCurrentOrgGroup:function(org){
+							if(org.oid!=this.modelInfo.orgGroup.oid){
+								this.$Modal.confirm({
+									title: '更改当前机构',
+									content: '<p>确定要更改为('+org.parent.name+'-'+org.name+')?<br/>更改完成后将刷新页面</p>',
+									loading: true,
+									onOk: function(){
+										$.execJSON("action/manageAdminGroup/setCurrentOrgGroup",{'model.oid':org.oid},function(json){
+											window.location.hash="";
+											location.reload();
+										});
+									}
+								});
+							}
+						},
 						logout:function(){
 							this.$Modal.confirm({
 								title: '退出系统',
 								content: '<p>确定要退出系统吗?</p>',
 								loading: true,
 								onOk: function(){
-									$.execJSON("action/manageAdminLogin/doLogout",{},function(json){});
-									window.location.hash="";
-									location.reload();
+									$.execJSON("action/manageAdminLogin/doLogout",{},function(json){
+										window.location.hash="";
+										location.reload();
+									});
 								}
 							});
 						},
@@ -306,7 +339,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							if(!this.init) return;
 							pageVue.$emit("changeModule",oid);
 						},
-						doOpenMenu:function(oid,flag){
+						doOpenMenu:function(oid){
 							if(!this.init) return;
 							var arr=this.menuMap[oid];
 							if(!arr[0]) this.doCloseMenu(oid);
@@ -316,9 +349,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							this.breadcrumb1=arr[0].name;
 							this.breadcrumb2=arr[1].name;
 							this.breadcrumb3=arr[2];
-							if(!flag){
-								this.tags.remove(oid);
-								this.tags.unshift(oid);
+							if(this.tags.indexOf(oid)<0){
+								this.tags.push(oid);
 								this.tagName[oid]=this.breadcrumb3;
 							}
 							window.location.hash=oid;
@@ -493,9 +525,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 										$.vue['main_admin'].modules=json.modules;
 										$.vue['main_admin'].menuMap=menuMap;
 										$.vue['main_admin'].init=true;
-										console.log($.vue['main_admin'].modules,$.vue['main_admin'].menuMap,$.vue['main_admin'].tags,$.vue['main_admin'].tagNames);
-										$.vue['main_admin'].setDefaultMenu(json.defaultMenuOid);
-										
+										if(json.defaultMenuOid){
+											$.vue['main_admin'].setDefaultMenu(json.defaultMenuOid);
+											$.execJSON('action/manageAdminGroup/getMyOrgGroup',{},function(json){
+												if(json.code==0){
+													$.vue['main_admin'].orgGroups=json.list;
+												}
+											});
+										}else{
+											pageVue.$Message.error("没有菜单");
+										}
 									}else{
 										pageVue.$Message.error(json.msg);
 									}
@@ -525,17 +564,52 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			"/resources/js/echarts-all.js",
 			"/resources/js/iview.min.js",
 			"/resources/js/vue-html5-editor.js",
+			"/resources/js/jsplumb.js",
 			"/resources/default/admin.js",
 			"/custom/admin.js"];
+		var loadTimer={
+			timer:null,
+			index:jsList.length,
+			max:jsList.length,
+			exec:function(i){
+				this.index=i;
+				this.timer=this.to();
+			},
+			n:0,
+			s:'.',
+			to:function(){
+				var self=this;
+				return setTimeout(function(){
+					if(self.timer){
+						clearTimeout(self.timer);
+						self.timer=null;
+					}
+					if(self.index<=0){
+						$("#load_js").html('${map.systemInfo.backgroundTitle }<br/><small>加载完成</small>').fadeOut(1000);
+					}else{
+						if(self.s.length>10) self.s='.';
+						else self.s+='.';
+						if(self.n<99&&self.n<(1-(self.index-1)/self.max)*100){
+							if(self.n<(1-self.index/self.max)*100){
+								self.n=Math.round((1-self.index/self.max)*100);
+							}else{
+								self.n++;
+							}
+						}
+						$("#load_js").html('${map.systemInfo.backgroundTitle }<br/><small>'+self.s+'资源加载中 '+self.n+"%"+self.s+"</small>");
+						self.timer=self.to();
+					}
+				},66);
+			}
+		};
 		function loadJs(){
+			loadTimer.exec(jsList.length);
 			if(jsList.length>0){
-				$("#load_js").html("${map.systemInfo.backgroundTitle }<br/><small>加载中...  剩余"+jsList.length+"项</small>");
 				$.getScript(jsList[0],function(data, status, jqxhr){
 					jsList.shift();
 					loadJs();
 				});
 			}else{
-				$("#load_js").hide();
 				jsLoadDone();
 			}
 		};
