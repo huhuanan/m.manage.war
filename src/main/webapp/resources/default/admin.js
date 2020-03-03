@@ -834,6 +834,7 @@ Vue.component('json-item', {
 					let d={openMode:this.mode};
 					let fields=param.field;
 					let valueFields=param.valueField;
+					if(fields.length==0) b=true;
 					for(let n=0;n<fields.length;n++){
 						let field=fields[n];
 						let valueField=valueFields[n];
@@ -1262,13 +1263,17 @@ Vue.component('json-item', {
 			},
 			statusRender:function(h,params,key){
 				if(params.row._count_row)return h('span', '');
-				var self=this;
-				var fk=key.replace(/\./g,'_');
-				var obj={value:params.row[fk]=='0'?true:false};
-				var sh=h('i-switch',{props:obj,
+				let self=this;
+				let fk=key.replace(/\./g,'_');
+				let oid=params.row["oid"];
+				if(fk.lastIndexOf('_')>=0){
+					oid=params.row[fk.substring(0,fk.lastIndexOf('_'))+'_oid'];
+				}
+				let obj={value:params.row[fk]=='0'?true:false};
+				let sh=h('i-switch',{props:obj,
 					on:{"on-change":function(flag){
-						var method=flag?"doRecovery":"doDisable";
-						$.execJSON(self.dataUrl.substring(0,self.dataUrl.lastIndexOf("/")+1)+method,{"model.oid":params.row[fk.substring(0,fk.lastIndexOf('_'))+'_oid']},function(json){
+						let method=flag?"doRecovery":"doDisable";
+						$.execJSON(self.dataUrl.substring(0,self.dataUrl.lastIndexOf("/")+1)+method,{"model.oid":oid},function(json){
 							if(json.code==0){
 								self.$Message.success(json.msg);
 							}else{
