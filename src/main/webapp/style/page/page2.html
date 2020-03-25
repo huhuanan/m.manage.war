@@ -1,0 +1,39 @@
+<page>
+	<vui-tool>
+		<vui-tool-item flex="0">
+			<vui-button title="" type="transparent" @on-click="back" ><vui-icon style="font-size:22px;line-height:35px;">&#xe679;</vui-icon></vui-button>
+		</vui-tool-item>
+		<vui-tool-item flex="1">
+		</vui-tool-item>
+		<vui-tool-item flex="0">
+			<vui-button title="" type="transparent" @on-click="top" ><vui-icon style="font-size:22px;line-height:35px;">&#xe69e;</vui-icon></vui-button>
+		</vui-tool-item>
+	</vui-tool>
+	<vui-scroller ref="scroller" bottom="45">
+		<vui-page-title @on-back="back" :back="true" title="页面返回"></vui-page-title>
+		<vui-row class="gap_md">
+			<vui-col class="gap_sm" ><vui-button title="提交" @on-click="submit" type="primary"></vui-button></vui-col>
+			<vui-col class="gap_sm" ><vui-button title="返回" @on-click="back('参数')" type="plain-default"></vui-button></vui-col>
+        </vui-row>
+</page>
+<script>
+(function(){
+	return {
+		data:{
+		},
+		mounted:function(){
+		},
+		methods:{
+            submit:function(){
+                $.alert("标题",'提交');
+            },
+			top:function(){
+				this.$refs['scroller'].toTop();
+			},
+			back:function(r){
+				pm.back('success',r);
+			}
+		}
+	};
+})();
+</script>

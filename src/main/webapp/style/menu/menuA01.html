@@ -1,0 +1,84 @@
+<page>
+	<vui-title>grid组件</vui-title>
+	<vui-panel type="panel_card">
+		<vui-grid-item icon="&#xe758;" size="30" color="#09bb07" ratio="25" title="按钮" @on-click="openPage('style/page/page1.html')"></vui-grid-item>
+		<vui-grid-item icon="&#xe752;" size="30" color="#f00" acolor="#f00" ratio="25" title="页面" flag="123" @on-click="openPage('style/page/page2.html')"></vui-grid-item>
+		<vui-grid-item image="style/image/head.jpg" size="50" color="#09bb07" ratio="25" title="优惠卡" flag="222" flagcolor="#09f"></vui-grid-item>
+		<vui-grid-item icon="&#xe682;" size="30" color="#09bb07" ratio="25" title="page1" @on-click="page1" ></vui-grid-item>
+	</vui-panel>
+	<vui-panel type="panel_card">
+		<vui-grid-cell icon="&#xe6fe;" size="25" padding="8" color="#09bb07" ratio="50" flag="123"  title="团券查看"></vui-grid-cell>
+		<vui-grid-cell icon="&#xe665;" size="25" padding="8" color="#09bb07" ratio="50" title="扫码"></vui-grid-cell>
+	</vui-panel>
+	<vui-title>panel组件 cell组件 link组件</vui-title>
+	<vui-panel type="panel_card" title="123" label="222">
+		<vui-cell @on-click="onclick">
+			<vui-cell-image image="style/image/head.jpg" width="60" height="60" radius="6"></vui-cell-image>
+			<vui-cell-text title="123" desc="222"></vui-cell-text>
+			<vui-cell-foot>333</vui-cell-foot>
+		</vui-cell>
+		<vui-cell>
+			<vui-cell-image icon="&#xe6fe;" width="60" color="#f00"></vui-cell-image>
+			<vui-cell-text title="123" desc="222"></vui-cell-text>
+			<vui-cell-foot>333</vui-cell-foot>
+		</vui-cell>
+		<vui-link>
+			<vui-link-image image="style/image/head.jpg" width="60" height="60" radius="6"></vui-link-image>
+			<vui-link-text title="ddd"></vui-link-text>
+			<vui-link-foot></vui-link-foot>
+		</vui-link>
+		<vui-link>
+			<vui-link-image icon="&#xe6fe;" color="#f00"></vui-link-image>
+			<vui-link-text title="ddd"></vui-link-text>
+			<vui-link-foot></vui-link-foot>
+		</vui-link>
+	</vui-panel>
+	<vui-image-panel>
+		<vui-image-item @on-click="onclick" image="style/image/head.jpg" ratio="33.33" title="3333" radius="10px"></vui-image-item>
+		<vui-image-item image="style/image/head.jpg" ratio="33.33" title="3333" radius="10px 0 10px 0"></vui-image-item>
+		<vui-image-item image="style/image/head.jpg" ratio="33.33" title="3333" >1234</vui-image-item>
+	</vui-image-panel>
+	<vui-panel type="panel_card">
+		<vui-form-item title="文字" hint="请输入文字">
+			<vui-form-foot slot="foot">获取验证码</vui-form-foot>
+		</vui-form-item>
+		<vui-form-item title="time" type="time" readonly="true"></vui-form-item>
+		<vui-form-item title="date" type="date"></vui-form-item>
+		<vui-form-item title="number" type="number">
+			<vui-form-foot slot="foot">元</vui-form-foot>
+		</vui-form-item>
+		<vui-form-item title="password" type="password"></vui-form-item>
+		<vui-form-item type="datetime-local"></vui-form-item>
+		<vui-form-text rows="3"></vui-form-text>
+		<vui-form-select v-model="selected" title="选择" :items="{a:'a',b:'b'}"></vui-form-select>
+		<vui-form-switch v-model="selected" title="开关" checked="a" nocheck="b"></vui-form-switch>
+		<vui-form-checkbox v-model="selected" title="多选框" checked="a" nocheck="b"></vui-form-checkbox>
+		<vui-form-radio v-model="selected" title="单选a" checked="a"></vui-form-radio>
+		<vui-form-radio v-model="selected" title="单选b" checked="b"></vui-form-radio>
+		<vui-form-star></vui-form-star>
+	</vui-panel>
+</page>
+<script>
+(function(){
+	return {
+		data:{
+			selected:'a'
+		},
+		mounted:function(){
+		},
+		methods:{
+			openPage:function(page){
+				pm.go(page,function(m){
+					$.alert(m);
+				});
+			},
+			onclick:function(){
+				$.alert("213");
+			},
+			page1:function(){
+				location="style?hash=style/page/page1.html";
+			}
+		}
+	};
+})();
+</script>

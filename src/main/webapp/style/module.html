@@ -1,0 +1,37 @@
+<page>
+	<vui-scroller :bottom="53" :style="{backgroundColor:'#f0f3ff'}">
+		<div :id="'module'+oid"></div>
+	</vui-scroller>
+</page>
+<script>
+(function(){
+	return {
+		data(){
+			//oid:''
+		},
+		mounted:function(){
+			var module=$("#module"+this.oid);
+			var list=[];
+			if(this.oid=='A'){
+				list=[{"oid":"A01","name":"滚动海报搜索导航","level":null,"urlPath":"style/menu/menuA01.html","sort":null,"isPublic":null,"module":{}},
+				{"oid":"A02","name":"验券扫码","level":null,"urlPath":"style/menu/menuA02.html","sort":null,"isPublic":null,"module":{}}];
+			}else if(this.oid=='E'){
+				list=[{"oid":"E01","name":"最新商品","level":null,"urlPath":"style/menu/menuE01.html","sort":null,"isPublic":null,"module":{}},
+				{"oid":"E02","name":"店铺地址","level":null,"urlPath":"style/menu/menuE02.html","sort":null,"isPublic":null,"module":{}}];
+			}
+
+			for(var i=0;i<list.length;i++){
+				var menu=$("<div></div>");
+				module.append(menu);
+				
+				$.loadVuePage(menu,list[i].urlPath,$.parseParams(list[i].urlPath),function(vue){
+					
+				});
+			}
+		},
+		methods:{
+			
+		}
+	};
+})();
+</script>

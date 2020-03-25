@@ -1,0 +1,37 @@
+<page>
+	<vui-panel :style="{marginTop:'-1px',minHeight:'120px',backgroundColor:'rgba(30,90,255,0.5)'}" :image="'style/image/back.jpg'">
+		<vui-cell @on-click="fn1" :style="{marginTop:'20px'}">
+			<vui-cell-image :image="'style/image/head.jpg'" radius="500"></vui-cell-image>
+			<vui-cell-text :title="'昵称'" class="text_shadow" style="color:#fff;">
+				<small>水水水水水水水水</small>
+			</vui-cell-text>
+			<vui-cell-foot>
+				<vui-icon :style="{color:'#fff'}">&#xe6a3;</vui-icon>
+			</vui-cell-foot>
+		</vui-cell>
+	</vui-panel>
+	<vui-panel type="panel_card" :style="{marginTop:'-20px'}">
+		<vui-link>
+			<vui-link-text :title="'就将计就计'"></vui-link-text>
+			<vui-link-foot>
+				<vui-level :level="1" :style="{float:'left',marginTop:'-4px'}"></vui-level>
+				会员
+			</vui-link-foot>
+		</vui-link>
+	</vui-panel>
+</page>
+<script>
+(function(){
+	return {
+		data:{
+		},
+		mounted:function(){
+		},
+		methods:{
+			fn1:function(){
+				$.alert("dddd");
+			}
+		}
+	};
+})();
+</script>

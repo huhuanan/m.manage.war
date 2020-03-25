@@ -835,6 +835,11 @@ var vui={
 	id:1,
 	dict:{},
 	util:{
+		fn_round:function(num,r){
+			if(!r)r=7;
+			let n=Math.pow(10,r);
+			return Math.round(num*n)/n;
+		},
 		fn_formatDate:function(date,style){
 			if(!date){
 				return "";
@@ -1112,6 +1117,9 @@ Vue.component('vui-nav-scroller',{
 				this.swiper.slideTo(this.index);
 			}
 			this.$emit('on-change', i);
+		},
+		reload:function(){
+			this.swiper.update(true);
 		}
 	}
 });
@@ -1776,3 +1784,38 @@ Vue.component('vui-form-image',{
 	}
 });
 
+//drawer容器 title属性 on-close事件  action插槽
+Vue.component('vui-drawer',{
+	template:`<div class="page" style="background-color:rgba(0,0,0,0.1);z-index:500;">
+		<div class="page" style="bottom:0;top:auto;height:auto;">
+			<vui-row class="gap_sm">
+				<vui-title style="padding:8px 15px;margin:0;">
+					{{title}}
+				</vui-title>
+				<vui-col class="gap_sm" style="text-align:right;">
+					<slot name="action"></slot>
+					<vui-button title="关闭" @on-click="back" :mini="true" ></vui-button>
+				</vui-col>
+			</vui-row>
+			<div :style="{maxHeight:maxHeight+'px',overflow:'scroll'}">
+				<slot></slot>
+			</div>
+		</div>
+	</div>`,
+	props:{
+		title:{type:String,default:""},
+	},
+	data(){
+		return {
+			maxHeight:100
+		};
+	},
+	mounted:function(){
+		this.maxHeight=$(window).height()*0.7;
+	},
+	methods:{
+		back:function(){
+			this.$emit('on-close',this);
+		}
+	}
+});
