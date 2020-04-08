@@ -18,6 +18,9 @@ var wxUtil={
 		}
 	}
 };
+var apUtil={
+	isAlipay:false,//是否支付宝客户端
+};
 $(function(){
 	var ua = window.navigator.userAgent.toLowerCase();
 	//console.log(ua);//mozilla/5.0 (iphone; cpu iphone os 9_1 like mac os x) applewebkit/601.1.46 (khtml, like gecko)version/9.0 mobile/13b143 safari/601.1
@@ -25,6 +28,11 @@ $(function(){
 		wxUtil.isWechat=true;
 	} else {
 		wxUtil.isWechat=false;
+	}
+	if (ua.match(/AlipayClient/i) == 'alipayclient') {
+		apUtil.isAlipay=true;
+	} else {
+		apUtil.isAlipay=false;
 	}
 	if(wx){
 		wx.ready(function(){
