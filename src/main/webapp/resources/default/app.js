@@ -20,6 +20,33 @@ var wxUtil={
 };
 var apUtil={
 	isAlipay:false,//是否支付宝客户端
+	scanQRCode:function(fn){
+		if(apUtil.isAlipay&&window.AlipayJSBridge){
+			AlipayJSBridge.call(
+				"scan",
+				{type: "qr"},
+				function(res) {
+					var result = res.codeContent; 
+					if(fn){
+						fn(result);
+					}
+				}
+			);
+		}else{
+			$.alert("扫码功能需要在支付宝客户端运行","提示");
+		}
+	}
+};
+var jsUtil={
+	scanQRCode:function(fn){
+		if(wxUtil.isWechat){
+			wxUtil.scanQRCode(fn);
+		}else if(apUtil.isAlipay&&window.AlipayJSBridge){
+			apUtil.scanQRCode(fn);
+		}else{
+			$.alert("扫码功能需要在微信客户端或支付宝客户端运行","提示");
+		}
+	}
 };
 $(function(){
 	var ua = window.navigator.userAgent.toLowerCase();
