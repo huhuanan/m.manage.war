@@ -831,7 +831,7 @@ Vue.component('json-item', {
 				for(let k in this.others){
 					let param=this.others[k];
 					let b=false;
-					let d={openMode:this.mode};
+					let d={openMode:'OTHER'};
 					let fields=param.field;
 					let valueFields=param.valueField;
 					if(fields.length==0) b=true;
