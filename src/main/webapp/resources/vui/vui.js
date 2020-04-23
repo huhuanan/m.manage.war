@@ -1355,7 +1355,7 @@ Vue.component('vui-cell',{
 //面板单元格图片  width宽  height高  icon图标  image图片
 Vue.component('vui-cell-image',{
 	template:`<div v-if="icon||image" class="weui-media-box__hd" :style="{width:width+'px',height:height+'px'}">
-		<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:width+'px'}">{{icon}}</i>
+		<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:width+'px',color:color}">{{icon}}</i>
 		<img v-if="undefined!=image" class="weui-media-box__thumb" :style="{borderRadius:radius+'px',width:width+'px',height:height+'px'}" :src="image" alt="">
 		<slot></slot>
 	</div>`,
@@ -1364,6 +1364,7 @@ Vue.component('vui-cell-image',{
 		height:{type:Number,default:60},
 		icon:{type:String},
 		image:{type:String},
+		color:{type:String,default:'#000'},
 		radius:{type:Number,default:0}
 	}
 });
@@ -1402,7 +1403,7 @@ Vue.component('vui-link',{
 //面板链接图片  width宽  height高  icon图标  image图片
 Vue.component('vui-link-image',{
 	template:`<div v-if="icon||image" class="weui-cell__hd" :style="{height:height+'px'}">
-		<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:width+'px',marginRight:'5px'}">{{icon}}</i>
+		<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:width+'px',marginRight:'5px',color:color}">{{icon}}</i>
 		<img v-if="undefined!=image" :style="[{borderRadius:radius+'px',width:width+'px',height:height+'px',marginRight:'5px',display:'block'}]" :src="image" alt="">
 	</div>`,
 	props:{
@@ -1410,6 +1411,7 @@ Vue.component('vui-link-image',{
 		height:{type:Number,default:22},
 		icon:{type:String},
 		image:{type:String},
+		color:{type:String,default:'#000'},
 		radius:{type:Number,default:3}
 	}
 });
@@ -1440,7 +1442,7 @@ Vue.component('vui-grid-item',{
 			<img v-if="undefined!=image" :style="{width:size+'px',height:size+'px',display:'block'}" :src="image" alt="">
 			<span v-if="flag" class="weui-badge" :style="'position: absolute;top:10%;left:55%;white-space:nowrap;background-color:'+flagcolor">{{flag}}</span>
 		</div>
-		<p class="weui-grid__label">{{title}}<slot></slot></p>
+		<p class="weui-grid__label" :style="{color:(acolor?color:'#000')}">{{title}}<slot></slot></p>
 	</div>`,
 	props:{
 		size:{type:Number,default:28},
@@ -1449,6 +1451,7 @@ Vue.component('vui-grid-item',{
 		flag:{type:Object},
 		flagcolor:{type:String,default:'#e64340'},
 		color:{type:String,default:'#000'},
+		acolor:{type:Boolean,default:false},
 		icon:{type:String},
 		image:{type:String},
 		title:{type:String}
@@ -1494,10 +1497,10 @@ Vue.component('vui-image-panel',{
 Vue.component('vui-image-item',{
 	template:`<div v-tap="{fn:onClick}" :style="{width:(ratio+'%'),display:'block',float:'left',position:'relative'}">
 			<div class="weui-image-grid">
-				<div style="border-radius:4px;box-shadow: 0px 0px 4px rgba(0,0,0,0.1);">
+				<div style="border-radius:8px;">
 					<img :src="image" alt="" :style="{width:'100%',borderRadius:radius}" />
 					<div class="weui-image__label">{{title}}<slot name="title"></slot></div>
-					<div style="background-color: rgba(255,255,255,0.8);border-radius:0 0 4px 4px;">
+					<div style="background-color: rgba(255,255,255,0.8);border-radius:0 0 8px 8px;">
 						<slot></slot>
 					</div>
 				</div>
@@ -1507,7 +1510,7 @@ Vue.component('vui-image-item',{
 		image:{type:String},
 		ratio:{type:Number,default:100},
 		title:{type:String},
-		radius:{type:String,default:'4px 4px 0 0'}
+		radius:{type:String,default:'8px 8px 0 0'}
 	},
 	methods:{
 		onClick:function(){
