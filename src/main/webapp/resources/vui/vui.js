@@ -1355,6 +1355,7 @@ Vue.component('vui-cell',{
 //面板单元格图片  width宽  height高  icon图标  image图片
 Vue.component('vui-cell-image',{
 	template:`<div v-if="icon||image" class="weui-media-box__hd" :style="{width:width+'px',height:height+'px'}">
+		<div v-if="icon" :style="{backgroundColor:'rgba(0,100,120,0.1)',marginTop:r1/2+'px',marginLeft:'3px',width:r1*3/2+'px',height:r1+'px',borderRadius:'100px',position:'absolute'}"></div>
 		<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:width+'px',color:color}">{{icon}}</i>
 		<img v-if="undefined!=image" class="weui-media-box__thumb" :style="{borderRadius:radius+'px',width:width+'px',height:height+'px'}" :src="image" alt="">
 		<slot></slot>
@@ -1366,6 +1367,12 @@ Vue.component('vui-cell-image',{
 		image:{type:String},
 		color:{type:String,default:'#000'},
 		radius:{type:Number,default:0}
+	},
+	data(){
+		return { r1:0 };
+	},
+	mounted:function(){
+		this.r1=parseFloat(this.width)/3*2;
 	}
 });
 //面板单元格中间文字  title标题，支持slot  desc描述，支持slot  
@@ -1403,6 +1410,7 @@ Vue.component('vui-link',{
 //面板链接图片  width宽  height高  icon图标  image图片
 Vue.component('vui-link-image',{
 	template:`<div v-if="icon||image" class="weui-cell__hd" :style="{height:height+'px'}">
+		<div v-if="icon" :style="{backgroundColor:'rgba(0,100,120,0.1)',marginTop:r1/2+'px',marginLeft:'3px',width:r1*3/2+'px',height:r1+'px',borderRadius:'100px',position:'absolute'}"></div>
 		<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:width+'px',marginRight:'5px',color:color}">{{icon}}</i>
 		<img v-if="undefined!=image" :style="[{borderRadius:radius+'px',width:width+'px',height:height+'px',marginRight:'5px',display:'block'}]" :src="image" alt="">
 	</div>`,
@@ -1413,6 +1421,12 @@ Vue.component('vui-link-image',{
 		image:{type:String},
 		color:{type:String,default:'#000'},
 		radius:{type:Number,default:3}
+	},
+	data(){
+		return { r1:0 };
+	},
+	mounted:function(){
+		this.r1=parseFloat(this.width)/3*2;
 	}
 });
 //面板链接中间文字  title标题，支持slot
@@ -1438,6 +1452,7 @@ Vue.component('vui-link-foot',{
 Vue.component('vui-grid-item',{
 	template:`<div class="weui-grid" :style="{width:ratio+'%',padding:padding+'px 0 '+(parseInt(padding)-4)+'px 0'}" v-tap="{fn:onClick}">
 		<div v-if="icon||image" class="weui-grid__icon" :style="{width:size+'px',height:size+'px'}">
+			<div v-if="icon" :style="{backgroundColor:'rgba(0,100,120,0.1)',marginTop:r1/2+'px',marginLeft:'3px',width:r1*3/2+'px',height:r1+'px',borderRadius:'100px',position:'absolute'}"></div>
 			<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:size+'px',color:color}">{{icon}}</i>
 			<img v-if="undefined!=image" :style="{width:size+'px',height:size+'px',display:'block'}" :src="image" alt="">
 			<span v-if="flag" class="weui-badge" :style="'position: absolute;top:10%;left:55%;white-space:nowrap;background-color:'+flagcolor">{{flag}}</span>
@@ -1456,6 +1471,12 @@ Vue.component('vui-grid-item',{
 		image:{type:String},
 		title:{type:String}
 	},
+	data(){
+		return { r1:0 };
+	},
+	mounted:function(){
+		this.r1=parseFloat(this.size)/3*2;
+	},
 	methods:{
 		onClick:function(){
 			this.$emit('on-click');
@@ -1464,8 +1485,11 @@ Vue.component('vui-grid-item',{
 });
 Vue.component('vui-grid-cell',{
 	template:`<div class="weui-grid" :style="{width:ratio+'%',padding:padding+'px 0 '+parseInt(padding)+'px 0'}" v-tap="{fn:onClick}">
-		<div v-if="icon||image" class="weui-grid__icon" :style="{height:size+'px',margin:'0',width:'100%',textAlign:'center'}">
-			<i v-if="undefined!=icon" class="iconfont" :style="{fontSize:size+'px',color:color,verticalAlign:'bottom'}">{{icon}}</i>
+		<div class="weui-grid__icon" :style="{height:size+'px',lineHeight:size+'px',margin:'0',width:'100%',textAlign:'center'}">
+			<div v-if="undefined!=icon" :style="{display:'inline-block',width:size+'px',height:size+'px'}">
+				<div v-if="icon" :style="{backgroundColor:'rgba(0,100,120,0.1)',marginTop:r1/2+'px',marginLeft:'3px',width:r1*3/2+'px',height:r1+'px',borderRadius:'100px',position:'absolute'}"></div>
+				<i class="iconfont" :style="{fontSize:size+'px',color:color,verticalAlign:'bottom'}">{{icon}}</i>
+			</div>
 			<img v-if="undefined!=image" :style="{width:size+'px',height:size+'px',display:'block',verticalAlign:'bottom'}" :src="image" alt="">
 			<span :style="{color:(acolor?color:'#000')}">{{title}}<slot></slot></span>
 			<span v-if="flag" class="weui-badge" :style="'position:absolute;top:10%;right:15%;white-space:nowrap;background-color:'+flagcolor">{{flag}}</span>
@@ -1482,6 +1506,12 @@ Vue.component('vui-grid-cell',{
 		icon:{type:String},
 		image:{type:String},
 		title:{type:String}
+	},
+	data(){
+		return { r1:0 };
+	},
+	mounted:function(){
+		this.r1=parseFloat(this.size)/3*2;
 	},
 	methods:{
 		onClick:function(){
@@ -1789,24 +1819,27 @@ Vue.component('vui-form-image',{
 
 //drawer容器 title属性 on-close事件  action插槽
 Vue.component('vui-drawer',{
-	template:`<div class="page" style="background-color:rgba(0,0,0,0.1);z-index:500;">
+	template:`<transition name="slide-fade-down">
+	<div class="page" v-show="value" style="height:200%;top:-100%;background-color:rgba(0,0,0,0.2);z-index:500;">
 		<div class="page" style="bottom:0;top:auto;height:auto;">
-			<vui-row class="gap_sm">
-				<vui-title style="padding:8px 15px;margin:0;">
+			<vui-row class="gap_sm" style="height:35px;">
+				<vui-title style="padding:8px 15px 3px;margin:0;">
 					{{title}}
 				</vui-title>
 				<vui-col class="gap_sm" style="text-align:right;">
-					<slot name="action"></slot>
-					<vui-button title="关闭" @on-click="back" :mini="true" ></vui-button>
+					<span><slot name="action"></slot></span>
+					<span><vui-button title="关闭" @on-click="back" :mini="true" type="transparent" ></vui-button></span>
 				</vui-col>
 			</vui-row>
 			<div :style="{maxHeight:maxHeight+'px',overflow:'scroll'}">
 				<slot></slot>
 			</div>
 		</div>
-	</div>`,
+	</div>
+	</transition>`,
 	props:{
 		title:{type:String,default:""},
+		value:{type:Boolean,default:true},
 	},
 	data(){
 		return {
