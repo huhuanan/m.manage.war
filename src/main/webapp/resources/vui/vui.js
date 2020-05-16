@@ -1828,7 +1828,7 @@ Vue.component('vui-drawer',{
 				</vui-title>
 				<vui-col class="gap_sm" style="text-align:right;">
 					<span><slot name="action"></slot></span>
-					<span><vui-button title="关闭" @on-click="back" :mini="true" type="transparent" ></vui-button></span>
+					<span><vui-button class="color_main" title="关闭" @on-click="back" :mini="true" type="transparent" ></vui-button></span>
 				</vui-col>
 			</vui-row>
 			<div :style="{maxHeight:maxHeight+'px',overflow:'scroll'}">
