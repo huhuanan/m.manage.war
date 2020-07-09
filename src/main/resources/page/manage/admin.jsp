@@ -17,6 +17,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/custom/admin.css" />
 		<script type="text/javascript">var $;</script>
 		<script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/jquery.min.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/vue.min.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/echarts-all.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/iview.min.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/vue-html5-editor.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/jsplumb.js"></script>
 		<script type="text/javascript">//style="display: block;position: absolute;width: 100%;"
 		function initVueComponent(){
 			Vue.use(iview, {
@@ -560,11 +565,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				$(document.body).append("<script type=\"text/javascript\" src=\"https://webapi.amap.com/maps?v=1.4.8&key=97aa8a15d5a9bc783e16236cc66d3662\"><\/script>");
 			});
 		}
-		var jsList=["/resources/js/vue.min.js",
-			"/resources/js/echarts-all.js",
-			"/resources/js/iview.min.js",
-			"/resources/js/vue-html5-editor.js",
-			"/resources/js/jsplumb.js",
+		var jsList=[
 			"/resources/default/admin.js",
 			"/custom/admin.js"];
 		var loadTimer={
@@ -615,7 +616,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		};
 		if($){}else{location.reload();}
 		$(function(){
-			if($("script").length!=4){location.reload();}
+			if($("script").length!=9){location.reload();}
 			loadJs();
 		});
 		</script>

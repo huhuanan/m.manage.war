@@ -1412,7 +1412,7 @@ Vue.component('json-item', {
 				}
 				for(var key in this.allColumns){
 					var item=this.allColumns[key];
-					if(item.field==column.key&&odr){
+					if(item.field&&item.field.replace(/\./g,'_')==column.key&&odr){
 						item.sortType=odr;
 					}else{
 						item.sortType=null;
